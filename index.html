@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Ponto em Campo</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div class="app-shell no-print">
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Controle operacional</p>
+        <h1>App de Ponto em Campo</h1>
+        <p class="hero-text">
+          Registre sua jornada com almoço e pausa extra opcional.
+          O sistema calcula horas trabalhadas, saldo diário, banco de horas
+          e gera relatório profissional para impressão.
+        </p>
+      </div>
+
+      <div class="hero-badge">
+        <span>Banco de horas</span>
+        <strong id="heroSaldo">+00:00</strong>
+        <small>saldo do período exibido</small>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <h2>Lançar ponto do dia</h2>
+            <p>Preencha conforme o app da empresa: início, almoço, pausa extra opcional e jornada finalizada.</p>
+          </div>
+          <button id="btnNovoRegistro" class="ghost-btn" type="button">Novo registro</button>
+        </div>
+
+        <form id="pontoForm" class="form-grid">
+          <input type="hidden" id="registroId" />
+
+          <label>
+            <span>Empresa</span>
+            <input type="text" id="empresaNome" value="Nome da Empresa" maxlength="120" required />
+          </label>
+
+          <label>
+            <span>CNPJ</span>
+            <input type="text" id="empresaCnpj" value="00.000.000/0001-00" maxlength="18" />
+          </label>
+
+          <label>
+            <span>Responsável / supervisor</span>
+            <input type="text" id="responsavelNome" value="Responsável / Conferência" maxlength="120" />
+          </label>
+
+          <label>
+            <span>Nome do operador</span>
+            <input type="text" id="nomeOperador" maxlength="80" required />
+          </label>
+
+          <label>
+            <span>Código / matrícula</span>
+            <input type="text" id="codigoOperador" maxlength="30" required />
+          </label>
+
+          <label>
+            <span>Data de nascimento</span>
+            <input type="date" id="dataNascimento" required />
+          </label>
+
+          <label>
+            <span>Parceiro de equipe</span>
+            <input type="text" id="parceiroEquipe" maxlength="80" />
+          </label>
+
+          <label>
+            <span>Usina / local</span>
+            <input type="text" id="localOperacao" maxlength="100" />
+          </label>
+
+          <label>
+            <span>Cidade / UF</span>
+            <input type="text" id="cidadeUf" maxlength="80" placeholder="Ex.: Manaus/AM" />
+          </label>
+
+          <label>
+            <span>Data de referência</span>
+            <input type="date" id="data" required />
+          </label>
+
+          <label>
+            <span>Início da jornada</span>
+            <input type="time" id="entrada" required />
+          </label>
+
+          <label>
+            <span>Ida almoço</span>
+            <input type="time" id="almocoSaida" required />
+          </label>
+
+          <label>
+            <span>Volta almoço</span>
+            <input type="time" id="almocoVolta" required />
+          </label>
+
+          <label>
+            <span>Pausa extra - início</span>
+            <input type="time" id="pausaInicio" />
+          </label>
+
+          <label>
+            <span>Pausa extra - fim</span>
+            <input type="time" id="pausaFim" />
+          </label>
+
+          <label>
+            <span>Jornada finalizada</span>
+            <input type="time" id="saida" required />
+          </label>
+
+          <label>
+            <span>Meta diária</span>
+            <input type="time" id="metaDiaria" value="08:00" required />
+          </label>
+
+          <label>
+            <span>Turno base</span>
+            <input type="text" id="turnoBase" value="07:30 / 12:00 / 13:00 / 17:30" />
+          </label>
+
+          <label class="full-width">
+            <span>Observação</span>
+            <input type="text" id="observacao" maxlength="180" placeholder="Ex.: viagem longa, pausa operacional, deslocamento..." />
+          </label>
+
+          <div class="full-width hint">
+            Se houver pausa extra, preencha início e fim. Se não houver, deixe os dois campos em branco.
+          </div>
+
+          <div class="preview-box full-width">
+            <div>
+              <small>Prévia de horas trabalhadas</small>
+              <strong id="previewHoras">00:00</strong>
+            </div>
+            <div>
+              <small>Prévia do saldo diário</small>
+              <strong id="previewSaldo">+00:00</strong>
+            </div>
+            <div>
+              <small>Status</small>
+              <strong id="previewStatus">Aguardando dados</strong>
+            </div>
+          </div>
+
+          <div class="form-actions full-width">
+            <button class="primary-btn" type="submit">Salvar registro</button>
+            <button class="secondary-btn" type="button" id="btnLimpar">Limpar</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card">
+        <div class="section-header compact">
+          <div>
+            <h2>Resumo</h2>
+            <p>Os cards consideram o período filtrado.</p>
+          </div>
+
+          <div class="toolbar">
+            <button id="btnImprimir" class="secondary-btn" type="button">Imprimir relatório</button>
+          </div>
+        </div>
+
+        <div class="stats-grid">
+          <article class="stat-box">
+            <span>Dias lançados</span>
+            <strong id="totalDias">0</strong>
+          </article>
+          <article class="stat-box">
+            <span>Horas trabalhadas</span>
+            <strong id="totalHoras">00:00</strong>
+          </article>
+          <article class="stat-box positive">
+            <span>Crédito de banco</span>
+            <strong id="bancoPositivo">00:00</strong>
+          </article>
+          <article class="stat-box negative">
+            <span>Débito de banco</span>
+            <strong id="bancoNegativo">00:00</strong>
+          </article>
+          <article class="stat-box highlight">
+            <span>Saldo do banco</span>
+            <strong id="saldoBanco">+00:00</strong>
+          </article>
+          <article class="stat-box">
+            <span>Dias acumulados (24h)</span>
+            <strong id="diasBanco">0</strong>
+          </article>
+          <article class="stat-box">
+            <span>Horas para 1 dia completo</span>
+            <strong id="faltamParaDia">24:00</strong>
+          </article>
+          <article class="stat-box">
+            <span>Média por dia</span>
+            <strong id="mediaDia">00:00</strong>
+          </article>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-header">
+          <div>
+            <h2>Histórico</h2>
+            <p>Edite ou exclua lançamentos quando necessário.</p>
+          </div>
+
+          <div class="toolbar">
+            <label>
+              <span>Filtrar por mês</span>
+              <input type="month" id="filtroMes" />
+            </label>
+            <button id="btnExportar" class="secondary-btn" type="button">Exportar CSV</button>
+            <button id="btnLimparTudo" class="danger-btn" type="button">Apagar tudo</button>
+          </div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Data</th>
+                <th>Operador</th>
+                <th>Código</th>
+                <th>Parceiro</th>
+                <th>Local</th>
+                <th>Cidade/UF</th>
+                <th>Entrada</th>
+                <th>Ida almoço</th>
+                <th>Volta almoço</th>
+                <th>Pausa início</th>
+                <th>Pausa fim</th>
+                <th>Saída</th>
+                <th>Trab.</th>
+                <th>Saldo</th>
+                <th>Status</th>
+                <th>Obs.</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaRegistros">
+              <tr>
+                <td colspan="17" class="empty-state">Nenhum registro lançado ainda.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <section id="printArea" class="print-area">
+    <div class="print-company">
+      <div>
+        <h1 id="printEmpresaNome">Nome da Empresa</h1>
+        <p id="printEmpresaCnpj">CNPJ: 00.000.000/0001-00</p>
+      </div>
+      <div class="print-meta-right">
+        <p id="printPeriodo">Período</p>
+        <p id="printGeradoEm">Emitido em</p>
+      </div>
+    </div>
+
+    <div class="print-title-box">
+      <h2>Relatório de Controle de Ponto em Campo</h2>
+      <p>Documento consolidado de jornada, banco de horas e conferência operacional.</p>
+    </div>
+
+    <div id="printResumoOperador" class="print-resumo"></div>
+
+    <table class="print-table">
+      <thead>
+        <tr>
+          <th>Data</th>
+          <th>Local</th>
+          <th>Cidade/UF</th>
+          <th>Entrada</th>
+          <th>Almoço ida</th>
+          <th>Almoço volta</th>
+          <th>Pausa início</th>
+          <th>Pausa fim</th>
+          <th>Saída</th>
+          <th>Horas</th>
+          <th>Saldo</th>
+          <th>Observação</th>
+        </tr>
+      </thead>
+      <tbody id="printTabela"></tbody>
+    </table>
+
+    <div class="print-footer-notes">
+      <p><strong>Turno base:</strong> <span id="printTurnoBase">07:30 / 12:00 / 13:00 / 17:30</span></p>
+      <p><strong>Meta diária:</strong> <span id="printMetaDiaria">08:00</span></p>
+    </div>
+
+    <div class="print-signatures">
+      <div class="signature-box">
+        <div class="signature-line"></div>
+        <p id="printAssinaturaOperador">Operador</p>
+      </div>
+      <div class="signature-box">
+        <div class="signature-line"></div>
+        <p id="printAssinaturaResponsavel">Responsável / Conferência</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
