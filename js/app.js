@@ -1,113 +1,129 @@
-const STORAGE_KEY = 'controle_ponto_campo_final_v2';
+const STORAGE_KEY = 'controle_ponto_campo_final_v3';
 
-const form = document.getElementById('pontoForm');
-const registroId = document.getElementById('registroId');
+const byId = (id) => document.getElementById(id);
 
-const empresaNomeInput = document.getElementById('empresaNome');
-const empresaCnpjInput = document.getElementById('empresaCnpj');
-const responsavelNomeInput = document.getElementById('responsavelNome');
+const form = byId('pontoForm');
+const registroId = byId('registroId');
 
-const nomeOperadorInput = document.getElementById('nomeOperador');
-const codigoOperadorInput = document.getElementById('codigoOperador');
-const dataNascimentoInput = document.getElementById('dataNascimento');
-const parceiroEquipeInput = document.getElementById('parceiroEquipe');
-const localOperacaoInput = document.getElementById('localOperacao');
-const cidadeUfInput = document.getElementById('cidadeUf');
+const empresaNomeInput = byId('empresaNome');
+const empresaCnpjInput = byId('empresaCnpj');
+const responsavelNomeInput = byId('responsavelNome');
 
-const dataInput = document.getElementById('data');
-const entradaInput = document.getElementById('entrada');
-const almocoSaidaInput = document.getElementById('almocoSaida');
-const almocoVoltaInput = document.getElementById('almocoVolta');
-const pausaInicioInput = document.getElementById('pausaInicio');
-const pausaFimInput = document.getElementById('pausaFim');
-const saidaInput = document.getElementById('saida');
-const metaDiariaInput = document.getElementById('metaDiaria');
-const turnoBaseInput = document.getElementById('turnoBase');
-const observacaoInput = document.getElementById('observacao');
+const nomeOperadorInput = byId('nomeOperador');
+const codigoOperadorInput = byId('codigoOperador');
+const dataNascimentoInput = byId('dataNascimento');
+const parceiroEquipeInput = byId('parceiroEquipe');
+const localOperacaoInput = byId('localOperacao');
+const cidadeUfInput = byId('cidadeUf');
 
-const filtroMesInput = document.getElementById('filtroMes');
-const tabelaRegistros = document.getElementById('tabelaRegistros');
+const dataInput = byId('data');
+const entradaInput = byId('entrada');
+const almocoSaidaInput = byId('almocoSaida');
+const almocoVoltaInput = byId('almocoVolta');
+const pausaInicioInput = byId('pausaInicio');
+const pausaFimInput = byId('pausaFim');
+const saidaInput = byId('saida');
+const metaDiariaInput = byId('metaDiaria');
+const turnoBaseInput = byId('turnoBase');
+const observacaoInput = byId('observacao');
 
-const previewHoras = document.getElementById('previewHoras');
-const previewSaldo = document.getElementById('previewSaldo');
-const previewStatus = document.getElementById('previewStatus');
+const filtroMesInput = byId('filtroMes');
+const tabelaRegistros = byId('tabelaRegistros');
 
-const totalDias = document.getElementById('totalDias');
-const totalHoras = document.getElementById('totalHoras');
-const bancoPositivo = document.getElementById('bancoPositivo');
-const bancoNegativo = document.getElementById('bancoNegativo');
-const saldoBanco = document.getElementById('saldoBanco');
-const diasBanco = document.getElementById('diasBanco');
-const faltamParaDia = document.getElementById('faltamParaDia');
-const mediaDia = document.getElementById('mediaDia');
-const heroSaldo = document.getElementById('heroSaldo');
+const previewHoras = byId('previewHoras');
+const previewSaldo = byId('previewSaldo');
+const previewStatus = byId('previewStatus');
 
-const btnLimpar = document.getElementById('btnLimpar');
-const btnLimparTudo = document.getElementById('btnLimparTudo');
-const btnNovoRegistro = document.getElementById('btnNovoRegistro');
-const btnExportar = document.getElementById('btnExportar');
-const btnImprimir = document.getElementById('btnImprimir');
+const totalDias = byId('totalDias');
+const totalHoras = byId('totalHoras');
+const bancoPositivo = byId('bancoPositivo');
+const bancoNegativo = byId('bancoNegativo');
+const saldoBanco = byId('saldoBanco');
+const diasBanco = byId('diasBanco');
+const faltamParaDia = byId('faltamParaDia');
+const mediaDia = byId('mediaDia');
+const heroSaldo = byId('heroSaldo');
 
-const printEmpresaNome = document.getElementById('printEmpresaNome');
-const printEmpresaCnpj = document.getElementById('printEmpresaCnpj');
-const printPeriodo = document.getElementById('printPeriodo');
-const printGeradoEm = document.getElementById('printGeradoEm');
-const printResumoOperador = document.getElementById('printResumoOperador');
-const printTabela = document.getElementById('printTabela');
-const printTurnoBase = document.getElementById('printTurnoBase');
-const printMetaDiaria = document.getElementById('printMetaDiaria');
-const printAssinaturaOperador = document.getElementById('printAssinaturaOperador');
-const printAssinaturaResponsavel = document.getElementById('printAssinaturaResponsavel');
+const btnLimpar = byId('btnLimpar');
+const btnLimparTudo = byId('btnLimparTudo');
+const btnNovoRegistro = byId('btnNovoRegistro');
+const btnExportar = byId('btnExportar');
+const btnImprimir = byId('btnImprimir');
+
+const printEmpresaNome = byId('printEmpresaNome');
+const printEmpresaCnpj = byId('printEmpresaCnpj');
+const printPeriodo = byId('printPeriodo');
+const printGeradoEm = byId('printGeradoEm');
+const printResumoOperador = byId('printResumoOperador');
+const printTabela = byId('printTabela');
+const printTurnoBase = byId('printTurnoBase');
+const printMetaDiaria = byId('printMetaDiaria');
+const printAssinaturaOperador = byId('printAssinaturaOperador');
+const printAssinaturaResponsavel = byId('printAssinaturaResponsavel');
 
 let registros = carregarRegistros();
 
 iniciar();
 
 function iniciar() {
-  definirDataAtual();
-  definirMesAtual();
-  atualizarPreview();
-  renderizarTudo();
+  try {
+    definirDataAtual();
+    definirMesAtual();
 
-  form.addEventListener('submit', salvarRegistro);
-  btnLimpar.addEventListener('click', limparFormulario);
-  btnNovoRegistro.addEventListener('click', limparFormulario);
-  btnLimparTudo.addEventListener('click', apagarTudo);
-  btnExportar.addEventListener('click', exportarCSV);
-  btnImprimir.addEventListener('click', imprimirRelatorio);
-  filtroMesInput.addEventListener('input', renderizarTudo);
+    if (empresaNomeInput && !empresaNomeInput.value) empresaNomeInput.value = 'Nome da Empresa';
+    if (empresaCnpjInput && !empresaCnpjInput.value) empresaCnpjInput.value = '00.000.000/0001-00';
+    if (responsavelNomeInput && !responsavelNomeInput.value) responsavelNomeInput.value = 'Responsável / Conferência';
+    if (metaDiariaInput && !metaDiariaInput.value) metaDiariaInput.value = '08:00';
+    if (turnoBaseInput && !turnoBaseInput.value) turnoBaseInput.value = '07:30 / 12:00 / 13:00 / 17:30';
 
-  [
-    empresaNomeInput,
-    empresaCnpjInput,
-    responsavelNomeInput,
-    nomeOperadorInput,
-    codigoOperadorInput,
-    dataNascimentoInput,
-    parceiroEquipeInput,
-    localOperacaoInput,
-    cidadeUfInput,
-    dataInput,
-    entradaInput,
-    almocoSaidaInput,
-    almocoVoltaInput,
-    pausaInicioInput,
-    pausaFimInput,
-    saidaInput,
-    metaDiariaInput,
-    turnoBaseInput,
-    observacaoInput
-  ].forEach((campo) => {
-    campo.addEventListener('input', atualizarPreview);
-    campo.addEventListener('change', atualizarPreview);
-  });
+    atualizarPreview();
+    renderizarTudo();
+
+    if (form) form.addEventListener('submit', salvarRegistro);
+    if (btnLimpar) btnLimpar.addEventListener('click', limparFormulario);
+    if (btnNovoRegistro) btnNovoRegistro.addEventListener('click', limparFormulario);
+    if (btnLimparTudo) btnLimparTudo.addEventListener('click', apagarTudo);
+    if (btnExportar) btnExportar.addEventListener('click', exportarCSV);
+    if (btnImprimir) btnImprimir.addEventListener('click', imprimirRelatorio);
+    if (filtroMesInput) filtroMesInput.addEventListener('input', renderizarTudo);
+
+    [
+      empresaNomeInput,
+      empresaCnpjInput,
+      responsavelNomeInput,
+      nomeOperadorInput,
+      codigoOperadorInput,
+      dataNascimentoInput,
+      parceiroEquipeInput,
+      localOperacaoInput,
+      cidadeUfInput,
+      dataInput,
+      entradaInput,
+      almocoSaidaInput,
+      almocoVoltaInput,
+      pausaInicioInput,
+      pausaFimInput,
+      saidaInput,
+      metaDiariaInput,
+      turnoBaseInput,
+      observacaoInput
+    ].forEach((campo) => {
+      if (!campo) return;
+      campo.addEventListener('input', atualizarPreview);
+      campo.addEventListener('change', atualizarPreview);
+    });
+  } catch (erro) {
+    console.error('Erro ao iniciar app:', erro);
+    alert('O app carregou com erro. Abra o console do navegador (F12) para verificar.');
+  }
 }
 
 function carregarRegistros() {
   try {
     const dados = JSON.parse(localStorage.getItem(STORAGE_KEY));
     return Array.isArray(dados) ? dados : [];
-  } catch {
+  } catch (erro) {
+    console.error('Erro ao carregar localStorage:', erro);
     return [];
   }
 }
@@ -119,59 +135,71 @@ function salvarNoStorage() {
 function salvarRegistro(evento) {
   evento.preventDefault();
 
-  const registro = {
-    id: registroId.value || gerarIdSeguro(),
-    empresaNome: empresaNomeInput.value.trim(),
-    empresaCnpj: empresaCnpjInput.value.trim(),
-    responsavelNome: responsavelNomeInput.value.trim(),
-    nomeOperador: nomeOperadorInput.value.trim(),
-    codigoOperador: codigoOperadorInput.value.trim(),
-    dataNascimento: dataNascimentoInput.value,
-    parceiroEquipe: parceiroEquipeInput.value.trim(),
-    localOperacao: localOperacaoInput.value.trim(),
-    cidadeUf: cidadeUfInput.value.trim(),
-    data: dataInput.value,
-    entrada: entradaInput.value,
-    almocoSaida: almocoSaidaInput.value,
-    almocoVolta: almocoVoltaInput.value,
-    pausaInicio: pausaInicioInput.value,
-    pausaFim: pausaFimInput.value,
-    saida: saidaInput.value,
-    metaDiaria: metaDiariaInput.value || '08:00',
-    turnoBase: turnoBaseInput.value.trim() || '07:30 / 12:00 / 13:00 / 17:30',
-    observacao: observacaoInput.value.trim()
-  };
+  try {
+    const registro = {
+      id: registroId?.value || gerarIdSeguro(),
+      empresaNome: valor(empresaNomeInput),
+      empresaCnpj: valor(empresaCnpjInput),
+      responsavelNome: valor(responsavelNomeInput),
+      nomeOperador: valor(nomeOperadorInput),
+      codigoOperador: valor(codigoOperadorInput),
+      dataNascimento: valor(dataNascimentoInput),
+      parceiroEquipe: valor(parceiroEquipeInput),
+      localOperacao: valor(localOperacaoInput),
+      cidadeUf: valor(cidadeUfInput),
+      data: valor(dataInput),
+      entrada: valor(entradaInput),
+      almocoSaida: valor(almocoSaidaInput),
+      almocoVolta: valor(almocoVoltaInput),
+      pausaInicio: valor(pausaInicioInput),
+      pausaFim: valor(pausaFimInput),
+      saida: valor(saidaInput),
+      metaDiaria: valor(metaDiariaInput) || '08:00',
+      turnoBase: valor(turnoBaseInput) || '07:30 / 12:00 / 13:00 / 17:30',
+      observacao: valor(observacaoInput)
+    };
 
-  const validacao = validarCamposRegistro(registro);
-  if (!validacao.valido) {
-    alert(validacao.erro);
-    return;
+    const validacao = validarCamposRegistro(registro);
+    if (!validacao.valido) {
+      alert(validacao.erro);
+      return;
+    }
+
+    const calculo = calcularRegistro(registro);
+    if (!calculo.valido) {
+      alert(calculo.erro);
+      return;
+    }
+
+    const indiceExistente = registros.findIndex((item) => item.id === registro.id);
+
+    if (indiceExistente >= 0) {
+      registros[indiceExistente] = registro;
+    } else {
+      registros.push(registro);
+    }
+
+    registros.sort((a, b) => obterDataInicial(a).getTime() - obterDataInicial(b).getTime());
+
+    salvarNoStorage();
+
+    console.log('Registro salvo:', registro);
+    console.log('Registros atuais:', registros);
+
+    renderizarTudo();
+    limparFormulario();
+    alert('Registro salvo com sucesso.');
+  } catch (erro) {
+    console.error('Erro ao salvar registro:', erro);
+    alert('O registro não foi salvo por erro no JavaScript. Aperte F12 e veja o console.');
   }
+}
 
-  const calculo = calcularRegistro(registro);
-  if (!calculo.valido) {
-    alert(calculo.erro);
-    return;
-  }
-
-  const indiceExistente = registros.findIndex((item) => item.id === registro.id);
-
-  if (indiceExistente >= 0) {
-    registros[indiceExistente] = registro;
-  } else {
-    registros.push(registro);
-  }
-
-  registros.sort((a, b) => obterDataInicial(a).getTime() - obterDataInicial(b).getTime());
-
-  salvarNoStorage();
-  renderizarTudo();
-  limparFormulario();
-  alert('Registro salvo com sucesso.');
+function valor(el) {
+  return el ? el.value.trim() : '';
 }
 
 function validarCamposRegistro(registro) {
-  if (!registro.empresaNome) return { valido: false, erro: 'Informe o nome da empresa.' };
   if (!registro.nomeOperador) return { valido: false, erro: 'Informe o nome do operador.' };
   if (!registro.codigoOperador) return { valido: false, erro: 'Informe o código ou matrícula.' };
   if (!registro.dataNascimento) return { valido: false, erro: 'Informe a data de nascimento.' };
@@ -192,13 +220,17 @@ function validarCamposRegistro(registro) {
 }
 
 function limparFormulario() {
+  if (!form) return;
+
   form.reset();
-  registroId.value = '';
-  empresaNomeInput.value = 'Nome da Empresa';
-  empresaCnpjInput.value = '00.000.000/0001-00';
-  responsavelNomeInput.value = 'Responsável / Conferência';
-  metaDiariaInput.value = '08:00';
-  turnoBaseInput.value = '07:30 / 12:00 / 13:00 / 17:30';
+
+  if (registroId) registroId.value = '';
+  if (empresaNomeInput) empresaNomeInput.value = 'Nome da Empresa';
+  if (empresaCnpjInput) empresaCnpjInput.value = '00.000.000/0001-00';
+  if (responsavelNomeInput) responsavelNomeInput.value = 'Responsável / Conferência';
+  if (metaDiariaInput) metaDiariaInput.value = '08:00';
+  if (turnoBaseInput) turnoBaseInput.value = '07:30 / 12:00 / 13:00 / 17:30';
+
   definirDataAtual();
   atualizarPreview();
 }
@@ -221,26 +253,26 @@ function editarRegistro(id) {
   const registro = registros.find((item) => item.id === id);
   if (!registro) return;
 
-  registroId.value = registro.id;
-  empresaNomeInput.value = registro.empresaNome || 'Nome da Empresa';
-  empresaCnpjInput.value = registro.empresaCnpj || '00.000.000/0001-00';
-  responsavelNomeInput.value = registro.responsavelNome || 'Responsável / Conferência';
-  nomeOperadorInput.value = registro.nomeOperador || '';
-  codigoOperadorInput.value = registro.codigoOperador || '';
-  dataNascimentoInput.value = registro.dataNascimento || '';
-  parceiroEquipeInput.value = registro.parceiroEquipe || '';
-  localOperacaoInput.value = registro.localOperacao || '';
-  cidadeUfInput.value = registro.cidadeUf || '';
-  dataInput.value = registro.data || '';
-  entradaInput.value = registro.entrada || '';
-  almocoSaidaInput.value = registro.almocoSaida || '';
-  almocoVoltaInput.value = registro.almocoVolta || '';
-  pausaInicioInput.value = registro.pausaInicio || '';
-  pausaFimInput.value = registro.pausaFim || '';
-  saidaInput.value = registro.saida || '';
-  metaDiariaInput.value = registro.metaDiaria || '08:00';
-  turnoBaseInput.value = registro.turnoBase || '07:30 / 12:00 / 13:00 / 17:30';
-  observacaoInput.value = registro.observacao || '';
+  if (registroId) registroId.value = registro.id;
+  if (empresaNomeInput) empresaNomeInput.value = registro.empresaNome || 'Nome da Empresa';
+  if (empresaCnpjInput) empresaCnpjInput.value = registro.empresaCnpj || '00.000.000/0001-00';
+  if (responsavelNomeInput) responsavelNomeInput.value = registro.responsavelNome || 'Responsável / Conferência';
+  if (nomeOperadorInput) nomeOperadorInput.value = registro.nomeOperador || '';
+  if (codigoOperadorInput) codigoOperadorInput.value = registro.codigoOperador || '';
+  if (dataNascimentoInput) dataNascimentoInput.value = registro.dataNascimento || '';
+  if (parceiroEquipeInput) parceiroEquipeInput.value = registro.parceiroEquipe || '';
+  if (localOperacaoInput) localOperacaoInput.value = registro.localOperacao || '';
+  if (cidadeUfInput) cidadeUfInput.value = registro.cidadeUf || '';
+  if (dataInput) dataInput.value = registro.data || '';
+  if (entradaInput) entradaInput.value = registro.entrada || '';
+  if (almocoSaidaInput) almocoSaidaInput.value = registro.almocoSaida || '';
+  if (almocoVoltaInput) almocoVoltaInput.value = registro.almocoVolta || '';
+  if (pausaInicioInput) pausaInicioInput.value = registro.pausaInicio || '';
+  if (pausaFimInput) pausaFimInput.value = registro.pausaFim || '';
+  if (saidaInput) saidaInput.value = registro.saida || '';
+  if (metaDiariaInput) metaDiariaInput.value = registro.metaDiaria || '08:00';
+  if (turnoBaseInput) turnoBaseInput.value = registro.turnoBase || '07:30 / 12:00 / 13:00 / 17:30';
+  if (observacaoInput) observacaoInput.value = registro.observacao || '';
 
   atualizarPreview();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -255,7 +287,7 @@ function excluirRegistro(id) {
 }
 
 function obterRegistrosFiltrados() {
-  const filtroMes = filtroMesInput.value;
+  const filtroMes = filtroMesInput ? filtroMesInput.value : '';
   const lista = [...registros].sort((a, b) => obterDataInicial(b).getTime() - obterDataInicial(a).getTime());
 
   if (!filtroMes) return lista;
@@ -270,6 +302,8 @@ function renderizarTudo() {
 }
 
 function renderizarTabela(lista) {
+  if (!tabelaRegistros) return;
+
   if (!lista.length) {
     tabelaRegistros.innerHTML = `
       <tr>
@@ -334,49 +368,52 @@ function renderizarResumo(lista) {
   const faltam = saldo > 0 ? (restoPositivo === 0 ? 0 : 1440 - restoPositivo) : 1440;
   const media = dias ? Math.round(totalTrabalhado / dias) : 0;
 
-  totalDias.textContent = String(dias);
-  totalHoras.textContent = formatarMinutos(totalTrabalhado);
-  bancoPositivo.textContent = formatarMinutos(positivo);
-  bancoNegativo.textContent = formatarMinutos(negativo);
-  saldoBanco.textContent = formatarMinutosAssinado(saldo);
-  diasBanco.textContent = String(diasFechados);
-  faltamParaDia.textContent = formatarMinutos(faltam);
-  mediaDia.textContent = formatarMinutos(media);
-  heroSaldo.textContent = formatarMinutosAssinado(saldo);
+  if (totalDias) totalDias.textContent = String(dias);
+  if (totalHoras) totalHoras.textContent = formatarMinutos(totalTrabalhado);
+  if (bancoPositivo) bancoPositivo.textContent = formatarMinutos(positivo);
+  if (bancoNegativo) bancoNegativo.textContent = formatarMinutos(negativo);
+  if (saldoBanco) saldoBanco.textContent = formatarMinutosAssinado(saldo);
+  if (diasBanco) diasBanco.textContent = String(diasFechados);
+  if (faltamParaDia) faltamParaDia.textContent = formatarMinutos(faltam);
+  if (mediaDia) mediaDia.textContent = formatarMinutos(media);
+  if (heroSaldo) heroSaldo.textContent = formatarMinutosAssinado(saldo);
 
-  saldoBanco.className = saldo > 0 ? 'text-positive' : saldo < 0 ? 'text-negative' : 'text-warning';
-  heroSaldo.className = saldo > 0 ? 'text-positive' : saldo < 0 ? 'text-negative' : 'text-warning';
+  if (saldoBanco) saldoBanco.className = saldo > 0 ? 'text-positive' : saldo < 0 ? 'text-negative' : 'text-warning';
+  if (heroSaldo) heroSaldo.className = saldo > 0 ? 'text-positive' : saldo < 0 ? 'text-negative' : 'text-warning';
 }
 
 function atualizarPreview() {
   const registroTemporario = {
-    data: dataInput.value,
-    entrada: entradaInput.value,
-    almocoSaida: almocoSaidaInput.value,
-    almocoVolta: almocoVoltaInput.value,
-    pausaInicio: pausaInicioInput.value,
-    pausaFim: pausaFimInput.value,
-    saida: saidaInput.value,
-    metaDiaria: metaDiariaInput.value || '08:00'
+    data: valor(dataInput),
+    entrada: valor(entradaInput),
+    almocoSaida: valor(almocoSaidaInput),
+    almocoVolta: valor(almocoVoltaInput),
+    pausaInicio: valor(pausaInicioInput),
+    pausaFim: valor(pausaFimInput),
+    saida: valor(saidaInput),
+    metaDiaria: valor(metaDiariaInput) || '08:00'
   };
 
   const calculo = calcularRegistro(registroTemporario, true);
 
   if (!calculo.valido) {
-    previewHoras.textContent = '00:00';
-    previewSaldo.textContent = '+00:00';
-    previewStatus.textContent = 'Aguardando dados';
-    previewSaldo.className = '';
+    if (previewHoras) previewHoras.textContent = '00:00';
+    if (previewSaldo) previewSaldo.textContent = '+00:00';
+    if (previewStatus) previewStatus.textContent = 'Aguardando dados';
+    if (previewSaldo) previewSaldo.className = '';
     return;
   }
 
-  previewHoras.textContent = formatarMinutos(calculo.horasTrabalhadasMinutos);
-  previewSaldo.textContent = formatarMinutosAssinado(calculo.saldoMinutos);
-  previewStatus.textContent = calculo.status;
-  previewSaldo.className =
-    calculo.saldoMinutos > 0 ? 'text-positive' :
-    calculo.saldoMinutos < 0 ? 'text-negative' :
-    'text-warning';
+  if (previewHoras) previewHoras.textContent = formatarMinutos(calculo.horasTrabalhadasMinutos);
+  if (previewSaldo) previewSaldo.textContent = formatarMinutosAssinado(calculo.saldoMinutos);
+  if (previewStatus) previewStatus.textContent = calculo.status;
+
+  if (previewSaldo) {
+    previewSaldo.className =
+      calculo.saldoMinutos > 0 ? 'text-positive' :
+      calculo.saldoMinutos < 0 ? 'text-negative' :
+      'text-warning';
+  }
 }
 
 function calcularRegistro(registro, silencioso = false) {
@@ -410,7 +447,6 @@ function calcularRegistro(registro, silencioso = false) {
 
   if (temPausa) {
     const [entrada, almocoSaida, almocoVolta, pausaInicio, pausaFim, saida] = linhaTempo;
-
     const trecho1 = diferencaMinutos(entrada, almocoSaida);
     const trecho2 = diferencaMinutos(almocoVolta, pausaInicio);
     const trecho3 = diferencaMinutos(pausaFim, saida);
@@ -422,7 +458,6 @@ function calcularRegistro(registro, silencioso = false) {
     horasTrabalhadasMinutos = trecho1 + trecho2 + trecho3;
   } else {
     const [entrada, almocoSaida, almocoVolta, saida] = linhaTempo;
-
     const trecho1 = diferencaMinutos(entrada, almocoSaida);
     const trecho2 = diferencaMinutos(almocoVolta, saida);
 
@@ -474,67 +509,77 @@ function criarLinhaDoTempo(dataBase, horarios) {
 }
 
 function renderizarRelatorioImpressao(lista) {
-  const calculados = lista.map((registro) => ({
-    ...registro,
-    calculo: calcularRegistro(registro)
-  }));
+  try {
+    if (!printResumoOperador || !printTabela) return;
 
-  const validos = calculados.filter((item) => item.calculo.valido);
-  const totalTrabalhado = somar(validos.map((item) => item.calculo.horasTrabalhadasMinutos));
-  const saldo = somar(validos.map((item) => item.calculo.saldoMinutos));
-  const credito = somar(validos.filter((item) => item.calculo.saldoMinutos > 0).map((item) => item.calculo.saldoMinutos));
-  const debito = somar(validos.filter((item) => item.calculo.saldoMinutos < 0).map((item) => Math.abs(item.calculo.saldoMinutos)));
+    const calculados = lista.map((registro) => ({
+      ...registro,
+      calculo: calcularRegistro(registro)
+    }));
 
-  const primeiro = lista[0] || {};
-  const operadorPrincipal = primeiro.nomeOperador || 'Não informado';
-  const codigoPrincipal = primeiro.codigoOperador || 'Não informado';
+    const validos = calculados.filter((item) => item.calculo.valido);
+    const totalTrabalhado = somar(validos.map((item) => item.calculo.horasTrabalhadasMinutos));
+    const saldo = somar(validos.map((item) => item.calculo.saldoMinutos));
+    const credito = somar(validos.filter((item) => item.calculo.saldoMinutos > 0).map((item) => item.calculo.saldoMinutos));
+    const debito = somar(validos.filter((item) => item.calculo.saldoMinutos < 0).map((item) => Math.abs(item.calculo.saldoMinutos)));
 
-  printEmpresaNome.textContent = primeiro.empresaNome || empresaNomeInput.value || 'Nome da Empresa';
-  printEmpresaCnpj.textContent = `CNPJ: ${primeiro.empresaCnpj || empresaCnpjInput.value || '00.000.000/0001-00'}`;
-  printPeriodo.textContent = filtroMesInput.value
-    ? `Período: ${formatarMesAno(filtroMesInput.value)}`
-    : 'Período: todos os registros';
-  printGeradoEm.textContent = `Emitido em: ${formatarDataHoraAtual()}`;
+    const primeiro = lista[0] || {};
+    const operadorPrincipal = primeiro.nomeOperador || 'Não informado';
+    const codigoPrincipal = primeiro.codigoOperador || 'Não informado';
 
-  printResumoOperador.innerHTML = `
-    <div class="print-kpi"><span>Operador</span><strong>${escaparHTML(operadorPrincipal)}</strong></div>
-    <div class="print-kpi"><span>Código</span><strong>${escaparHTML(codigoPrincipal)}</strong></div>
-    <div class="print-kpi"><span>Total de dias</span><strong>${lista.length}</strong></div>
-    <div class="print-kpi"><span>Horas trabalhadas</span><strong>${formatarMinutos(totalTrabalhado)}</strong></div>
-    <div class="print-kpi"><span>Crédito</span><strong>${formatarMinutos(credito)}</strong></div>
-    <div class="print-kpi"><span>Débito</span><strong>${formatarMinutos(debito)}</strong></div>
-    <div class="print-kpi"><span>Saldo</span><strong>${formatarMinutosAssinado(saldo)}</strong></div>
-  `;
+    if (printEmpresaNome) printEmpresaNome.textContent = primeiro.empresaNome || valor(empresaNomeInput) || 'Nome da Empresa';
+    if (printEmpresaCnpj) printEmpresaCnpj.textContent = `CNPJ: ${primeiro.empresaCnpj || valor(empresaCnpjInput) || '00.000.000/0001-00'}`;
+    if (printPeriodo) {
+      printPeriodo.textContent = filtroMesInput && filtroMesInput.value
+        ? `Período: ${formatarMesAno(filtroMesInput.value)}`
+        : 'Período: todos os registros';
+    }
+    if (printGeradoEm) printGeradoEm.textContent = `Emitido em: ${formatarDataHoraAtual()}`;
 
-  printTurnoBase.textContent = primeiro.turnoBase || turnoBaseInput.value || '07:30 / 12:00 / 13:00 / 17:30';
-  printMetaDiaria.textContent = primeiro.metaDiaria || metaDiariaInput.value || '08:00';
+    printResumoOperador.innerHTML = `
+      <div class="print-kpi"><span>Operador</span><strong>${escaparHTML(operadorPrincipal)}</strong></div>
+      <div class="print-kpi"><span>Código</span><strong>${escaparHTML(codigoPrincipal)}</strong></div>
+      <div class="print-kpi"><span>Total de dias</span><strong>${lista.length}</strong></div>
+      <div class="print-kpi"><span>Horas trabalhadas</span><strong>${formatarMinutos(totalTrabalhado)}</strong></div>
+      <div class="print-kpi"><span>Crédito</span><strong>${formatarMinutos(credito)}</strong></div>
+      <div class="print-kpi"><span>Débito</span><strong>${formatarMinutos(debito)}</strong></div>
+      <div class="print-kpi"><span>Saldo</span><strong>${formatarMinutosAssinado(saldo)}</strong></div>
+    `;
 
-  if (!lista.length) {
-    printTabela.innerHTML = `<tr><td colspan="12">Nenhum registro para impressão.</td></tr>`;
-  } else {
-    printTabela.innerHTML = lista.map((registro) => {
-      const calculo = calcularRegistro(registro);
-      return `
-        <tr>
-          <td>${formatarDataBR(registro.data)}</td>
-          <td>${escaparHTML(registro.localOperacao || '-')}</td>
-          <td>${escaparHTML(registro.cidadeUf || '-')}</td>
-          <td>${escaparHTML(registro.entrada || '-')}</td>
-          <td>${escaparHTML(registro.almocoSaida || '-')}</td>
-          <td>${escaparHTML(registro.almocoVolta || '-')}</td>
-          <td>${escaparHTML(registro.pausaInicio || '-')}</td>
-          <td>${escaparHTML(registro.pausaFim || '-')}</td>
-          <td>${escaparHTML(registro.saida || '-')}</td>
-          <td>${formatarMinutos(calculo.horasTrabalhadasMinutos)}</td>
-          <td>${formatarMinutosAssinado(calculo.saldoMinutos)}</td>
-          <td>${escaparHTML(registro.observacao || '-')}</td>
-        </tr>
-      `;
-    }).join('');
+    if (printTurnoBase) printTurnoBase.textContent = primeiro.turnoBase || valor(turnoBaseInput) || '07:30 / 12:00 / 13:00 / 17:30';
+    if (printMetaDiaria) printMetaDiaria.textContent = primeiro.metaDiaria || valor(metaDiariaInput) || '08:00';
+
+    if (!lista.length) {
+      printTabela.innerHTML = `<tr><td colspan="12">Nenhum registro para impressão.</td></tr>`;
+    } else {
+      printTabela.innerHTML = lista.map((registro) => {
+        const calculo = calcularRegistro(registro);
+        return `
+          <tr>
+            <td>${formatarDataBR(registro.data)}</td>
+            <td>${escaparHTML(registro.localOperacao || '-')}</td>
+            <td>${escaparHTML(registro.cidadeUf || '-')}</td>
+            <td>${escaparHTML(registro.entrada || '-')}</td>
+            <td>${escaparHTML(registro.almocoSaida || '-')}</td>
+            <td>${escaparHTML(registro.almocoVolta || '-')}</td>
+            <td>${escaparHTML(registro.pausaInicio || '-')}</td>
+            <td>${escaparHTML(registro.pausaFim || '-')}</td>
+            <td>${escaparHTML(registro.saida || '-')}</td>
+            <td>${formatarMinutos(calculo.horasTrabalhadasMinutos)}</td>
+            <td>${formatarMinutosAssinado(calculo.saldoMinutos)}</td>
+            <td>${escaparHTML(registro.observacao || '-')}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    if (printAssinaturaOperador) printAssinaturaOperador.textContent = operadorPrincipal;
+    if (printAssinaturaResponsavel) {
+      printAssinaturaResponsavel.textContent = primeiro.responsavelNome || valor(responsavelNomeInput) || 'Responsável / Conferência';
+    }
+  } catch (erro) {
+    console.error('Erro ao montar relatório de impressão:', erro);
   }
-
-  printAssinaturaOperador.textContent = operadorPrincipal;
-  printAssinaturaResponsavel.textContent = primeiro.responsavelNome || responsavelNomeInput.value || 'Responsável / Conferência';
 }
 
 function exportarCSV() {
@@ -605,7 +650,7 @@ function exportarCSV() {
 
   const link = document.createElement('a');
   link.href = url;
-  link.download = `controle-ponto-${filtroMesInput.value || 'todos'}.csv`;
+  link.download = `controle-ponto-${filtroMesInput && filtroMesInput.value ? filtroMesInput.value : 'todos'}.csv`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
@@ -673,6 +718,7 @@ function obterDataInicial(registro) {
 }
 
 function definirDataAtual() {
+  if (!dataInput) return;
   const hoje = new Date();
   const ano = hoje.getFullYear();
   const mes = String(hoje.getMonth() + 1).padStart(2, '0');
@@ -681,6 +727,7 @@ function definirDataAtual() {
 }
 
 function definirMesAtual() {
+  if (!filtroMesInput) return;
   const hoje = new Date();
   const ano = hoje.getFullYear();
   const mes = String(hoje.getMonth() + 1).padStart(2, '0');
