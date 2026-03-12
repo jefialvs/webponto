@@ -91,17 +91,17 @@
 
           <label>
             <span>Início da jornada</span>
-            <input type="time" id="entrada" required />
+            <input type="time" id="entrada" />
           </label>
 
           <label>
             <span>Ida almoço</span>
-            <input type="time" id="almocoSaida" required />
+            <input type="time" id="almocoSaida" />
           </label>
 
           <label>
             <span>Volta almoço</span>
-            <input type="time" id="almocoVolta" required />
+            <input type="time" id="almocoVolta" />
           </label>
 
           <label>
@@ -116,7 +116,7 @@
 
           <label>
             <span>Jornada finalizada</span>
-            <input type="time" id="saida" required />
+            <input type="time" id="saida" />
           </label>
 
           <label>
@@ -136,6 +136,7 @@
 
           <div class="full-width hint">
             Se houver pausa extra, preencha início e fim. Se não houver, deixe os dois campos em branco.
+            Campo vazio (<strong>--:--</strong>) é ignorado. Já <strong>00:00</strong> conta como meia-noite.
           </div>
 
           <div class="preview-box full-width">
