@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'controle_ponto_campo_final_v4';
+const STORAGE_KEY = 'controle_ponto_campo_progressivo_v1';
 
 const byId = (id) => document.getElementById(id);
 
@@ -66,64 +66,57 @@ let registros = carregarRegistros();
 iniciar();
 
 function iniciar() {
-  try {
-    definirDataAtual();
-    definirMesAtual();
+  definirDataAtual();
+  definirMesAtual();
 
-    if (empresaNomeInput && !empresaNomeInput.value) empresaNomeInput.value = 'Nome da Empresa';
-    if (empresaCnpjInput && !empresaCnpjInput.value) empresaCnpjInput.value = '00.000.000/0001-00';
-    if (responsavelNomeInput && !responsavelNomeInput.value) responsavelNomeInput.value = 'Responsável / Conferência';
-    if (metaDiariaInput && !metaDiariaInput.value) metaDiariaInput.value = '08:00';
-    if (turnoBaseInput && !turnoBaseInput.value) turnoBaseInput.value = '07:30 / 12:00 / 13:00 / 17:30';
+  if (empresaNomeInput && !empresaNomeInput.value) empresaNomeInput.value = 'Nome da Empresa';
+  if (empresaCnpjInput && !empresaCnpjInput.value) empresaCnpjInput.value = '00.000.000/0001-00';
+  if (responsavelNomeInput && !responsavelNomeInput.value) responsavelNomeInput.value = 'Responsável / Conferência';
+  if (metaDiariaInput && !metaDiariaInput.value) metaDiariaInput.value = '08:00';
+  if (turnoBaseInput && !turnoBaseInput.value) turnoBaseInput.value = '07:30 / 12:00 / 13:00 / 17:30';
 
-    atualizarPreview();
-    renderizarTudo();
+  atualizarPreview();
+  renderizarTudo();
 
-    if (form) form.addEventListener('submit', salvarRegistro);
-    if (btnLimpar) btnLimpar.addEventListener('click', limparFormulario);
-    if (btnNovoRegistro) btnNovoRegistro.addEventListener('click', limparFormulario);
-    if (btnLimparTudo) btnLimparTudo.addEventListener('click', apagarTudo);
-    if (btnExportar) btnExportar.addEventListener('click', exportarCSV);
-    if (btnImprimir) btnImprimir.addEventListener('click', imprimirRelatorio);
-    if (filtroMesInput) filtroMesInput.addEventListener('input', renderizarTudo);
+  form?.addEventListener('submit', salvarRegistro);
+  btnLimpar?.addEventListener('click', limparFormulario);
+  btnNovoRegistro?.addEventListener('click', limparFormulario);
+  btnLimparTudo?.addEventListener('click', apagarTudo);
+  btnExportar?.addEventListener('click', exportarCSV);
+  btnImprimir?.addEventListener('click', imprimirRelatorio);
+  filtroMesInput?.addEventListener('input', renderizarTudo);
 
-    [
-      empresaNomeInput,
-      empresaCnpjInput,
-      responsavelNomeInput,
-      nomeOperadorInput,
-      codigoOperadorInput,
-      dataNascimentoInput,
-      parceiroEquipeInput,
-      localOperacaoInput,
-      cidadeUfInput,
-      dataInput,
-      entradaInput,
-      almocoSaidaInput,
-      almocoVoltaInput,
-      pausaInicioInput,
-      pausaFimInput,
-      saidaInput,
-      metaDiariaInput,
-      turnoBaseInput,
-      observacaoInput
-    ].forEach((campo) => {
-      if (!campo) return;
-      campo.addEventListener('input', atualizarPreview);
-      campo.addEventListener('change', atualizarPreview);
-    });
-  } catch (erro) {
-    console.error('Erro ao iniciar app:', erro);
-    alert('O app carregou com erro. Abra o console do navegador (F12) para verificar.');
-  }
+  [
+    empresaNomeInput,
+    empresaCnpjInput,
+    responsavelNomeInput,
+    nomeOperadorInput,
+    codigoOperadorInput,
+    dataNascimentoInput,
+    parceiroEquipeInput,
+    localOperacaoInput,
+    cidadeUfInput,
+    dataInput,
+    entradaInput,
+    almocoSaidaInput,
+    almocoVoltaInput,
+    pausaInicioInput,
+    pausaFimInput,
+    saidaInput,
+    metaDiariaInput,
+    turnoBaseInput,
+    observacaoInput
+  ].forEach((campo) => {
+    campo?.addEventListener('input', atualizarPreview);
+    campo?.addEventListener('change', atualizarPreview);
+  });
 }
 
 function carregarRegistros() {
   try {
     const dados = JSON.parse(localStorage.getItem(STORAGE_KEY));
     return Array.isArray(dados) ? dados : [];
-  } catch (erro) {
-    console.error('Erro ao carregar localStorage:', erro);
+  } catch {
     return [];
   }
 }
@@ -133,100 +126,117 @@ function salvarNoStorage() {
 }
 
 function valor(el) {
-  if (!el) return '';
-  return String(el.value || '').trim();
+  return el ? String(el.value || '').trim() : '';
 }
 
-function normalizarHora(valorHora) {
-  const valor = String(valorHora || '').trim();
-  return valor === '' ? '' : valor;
+function normalizarHora(v) {
+  const texto = String(v || '').trim();
+  return texto === '' ? '' : texto;
 }
 
 function salvarRegistro(evento) {
   evento.preventDefault();
 
-  try {
-    const registro = {
-      id: registroId?.value || gerarIdSeguro(),
-      empresaNome: valor(empresaNomeInput),
-      empresaCnpj: valor(empresaCnpjInput),
-      responsavelNome: valor(responsavelNomeInput),
-      nomeOperador: valor(nomeOperadorInput),
-      codigoOperador: valor(codigoOperadorInput),
-      dataNascimento: valor(dataNascimentoInput),
-      parceiroEquipe: valor(parceiroEquipeInput),
-      localOperacao: valor(localOperacaoInput),
-      cidadeUf: valor(cidadeUfInput),
-      data: valor(dataInput),
+  const registro = {
+    id: valor(registroId) || gerarIdSeguro(),
+    empresaNome: valor(empresaNomeInput),
+    empresaCnpj: valor(empresaCnpjInput),
+    responsavelNome: valor(responsavelNomeInput),
+    nomeOperador: valor(nomeOperadorInput),
+    codigoOperador: valor(codigoOperadorInput),
+    dataNascimento: valor(dataNascimentoInput),
+    parceiroEquipe: valor(parceiroEquipeInput),
+    localOperacao: valor(localOperacaoInput),
+    cidadeUf: valor(cidadeUfInput),
+    data: valor(dataInput),
+    entrada: normalizarHora(entradaInput?.value),
+    almocoSaida: normalizarHora(almocoSaidaInput?.value),
+    almocoVolta: normalizarHora(almocoVoltaInput?.value),
+    pausaInicio: normalizarHora(pausaInicioInput?.value),
+    pausaFim: normalizarHora(pausaFimInput?.value),
+    saida: normalizarHora(saidaInput?.value),
+    metaDiaria: normalizarHora(metaDiariaInput?.value) || '08:00',
+    turnoBase: valor(turnoBaseInput) || '07:30 / 12:00 / 13:00 / 17:30',
+    observacao: valor(observacaoInput)
+  };
 
-      entrada: normalizarHora(entradaInput?.value),
-      almocoSaida: normalizarHora(almocoSaidaInput?.value),
-      almocoVolta: normalizarHora(almocoVoltaInput?.value),
-      pausaInicio: normalizarHora(pausaInicioInput?.value),
-      pausaFim: normalizarHora(pausaFimInput?.value),
-      saida: normalizarHora(saidaInput?.value),
-
-      metaDiaria: normalizarHora(metaDiariaInput?.value) || '08:00',
-      turnoBase: valor(turnoBaseInput) || '07:30 / 12:00 / 13:00 / 17:30',
-      observacao: valor(observacaoInput)
-    };
-
-    const validacao = validarCamposRegistro(registro);
-    if (!validacao.valido) {
-      alert(validacao.erro);
-      return;
-    }
-
-    const calculo = calcularRegistro(registro);
-    if (!calculo.valido) {
-      alert(calculo.erro);
-      return;
-    }
-
-    const indiceExistente = registros.findIndex((item) => item.id === registro.id);
-
-    if (indiceExistente >= 0) {
-      registros[indiceExistente] = registro;
-    } else {
-      registros.push(registro);
-    }
-
-    registros.sort((a, b) => obterDataInicial(a).getTime() - obterDataInicial(b).getTime());
-
-    salvarNoStorage();
-    renderizarTudo();
-    limparFormulario();
-    alert('Registro salvo com sucesso.');
-  } catch (erro) {
-    console.error('Erro ao salvar registro:', erro);
-    alert('O registro não foi salvo por erro no JavaScript. Aperte F12 e veja o console.');
+  const validacao = validarCamposBasicos(registro);
+  if (!validacao.valido) {
+    alert(validacao.erro);
+    return;
   }
+
+  const validacaoSequencia = validarSequenciaParcial(registro);
+  if (!validacaoSequencia.valido) {
+    alert(validacaoSequencia.erro);
+    return;
+  }
+
+  const indiceMesmoDia = registros.findIndex(
+    (item) =>
+      item.data === registro.data &&
+      item.codigoOperador === registro.codigoOperador
+  );
+
+  if (registro.id && registros.some((item) => item.id === registro.id)) {
+    const indiceId = registros.findIndex((item) => item.id === registro.id);
+    registros[indiceId] = registro;
+  } else if (indiceMesmoDia >= 0) {
+    registro.id = registros[indiceMesmoDia].id;
+    registros[indiceMesmoDia] = registro;
+  } else {
+    registros.push(registro);
+  }
+
+  registros.sort((a, b) => obterDataInicial(a).getTime() - obterDataInicial(b).getTime());
+
+  salvarNoStorage();
+  renderizarTudo();
+  limparFormulario();
+
+  alert('Ponto salvo com sucesso.');
 }
 
-function validarCamposRegistro(registro) {
+function validarCamposBasicos(registro) {
   if (!registro.nomeOperador) return { valido: false, erro: 'Informe o nome do operador.' };
   if (!registro.codigoOperador) return { valido: false, erro: 'Informe o código ou matrícula.' };
   if (!registro.dataNascimento) return { valido: false, erro: 'Informe a data de nascimento.' };
   if (!registro.data) return { valido: false, erro: 'Informe a data de referência.' };
 
-  if (!registro.entrada || !registro.almocoSaida || !registro.almocoVolta || !registro.saida) {
-    return { valido: false, erro: 'Preencha início, ida almoço, volta almoço e jornada finalizada.' };
+  const pontos = [
+    registro.entrada,
+    registro.almocoSaida,
+    registro.almocoVolta,
+    registro.pausaInicio,
+    registro.pausaFim,
+    registro.saida
+  ].filter(Boolean);
+
+  if (!pontos.length) {
+    return { valido: false, erro: 'Informe pelo menos um ponto para salvar.' };
   }
 
-  const temPausaInicio = !!registro.pausaInicio;
-  const temPausaFim = !!registro.pausaFim;
+  return { valido: true };
+}
 
-  if (temPausaInicio !== temPausaFim) {
-    return { valido: false, erro: 'Se houver pausa extra, preencha início e fim da pausa.' };
+function validarSequenciaParcial(registro) {
+  if (registro.pausaInicio && !registro.almocoVolta) {
+    return { valido: false, erro: 'Não é possível lançar pausa extra antes da volta do almoço.' };
+  }
+
+  if (registro.pausaFim && !registro.pausaInicio) {
+    return { valido: false, erro: 'Preencha o início da pausa extra antes do fim.' };
+  }
+
+  if (registro.saida && registro.pausaInicio && !registro.pausaFim) {
+    return { valido: false, erro: 'Se houver pausa extra, preencha também o fim da pausa antes da saída.' };
   }
 
   return { valido: true };
 }
 
 function limparFormulario() {
-  if (!form) return;
-
-  form.reset();
+  form?.reset();
 
   if (registroId) registroId.value = '';
   if (empresaNomeInput) empresaNomeInput.value = 'Nome da Empresa';
@@ -254,29 +264,29 @@ function apagarTudo() {
 }
 
 function editarRegistro(id) {
-  const registro = registros.find((item) => item.id === id);
-  if (!registro) return;
+  const r = registros.find((item) => item.id === id);
+  if (!r) return;
 
-  if (registroId) registroId.value = registro.id;
-  if (empresaNomeInput) empresaNomeInput.value = registro.empresaNome || 'Nome da Empresa';
-  if (empresaCnpjInput) empresaCnpjInput.value = registro.empresaCnpj || '00.000.000/0001-00';
-  if (responsavelNomeInput) responsavelNomeInput.value = registro.responsavelNome || 'Responsável / Conferência';
-  if (nomeOperadorInput) nomeOperadorInput.value = registro.nomeOperador || '';
-  if (codigoOperadorInput) codigoOperadorInput.value = registro.codigoOperador || '';
-  if (dataNascimentoInput) dataNascimentoInput.value = registro.dataNascimento || '';
-  if (parceiroEquipeInput) parceiroEquipeInput.value = registro.parceiroEquipe || '';
-  if (localOperacaoInput) localOperacaoInput.value = registro.localOperacao || '';
-  if (cidadeUfInput) cidadeUfInput.value = registro.cidadeUf || '';
-  if (dataInput) dataInput.value = registro.data || '';
-  if (entradaInput) entradaInput.value = registro.entrada || '';
-  if (almocoSaidaInput) almocoSaidaInput.value = registro.almocoSaida || '';
-  if (almocoVoltaInput) almocoVoltaInput.value = registro.almocoVolta || '';
-  if (pausaInicioInput) pausaInicioInput.value = registro.pausaInicio || '';
-  if (pausaFimInput) pausaFimInput.value = registro.pausaFim || '';
-  if (saidaInput) saidaInput.value = registro.saida || '';
-  if (metaDiariaInput) metaDiariaInput.value = registro.metaDiaria || '08:00';
-  if (turnoBaseInput) turnoBaseInput.value = registro.turnoBase || '07:30 / 12:00 / 13:00 / 17:30';
-  if (observacaoInput) observacaoInput.value = registro.observacao || '';
+  if (registroId) registroId.value = r.id;
+  if (empresaNomeInput) empresaNomeInput.value = r.empresaNome || 'Nome da Empresa';
+  if (empresaCnpjInput) empresaCnpjInput.value = r.empresaCnpj || '00.000.000/0001-00';
+  if (responsavelNomeInput) responsavelNomeInput.value = r.responsavelNome || 'Responsável / Conferência';
+  if (nomeOperadorInput) nomeOperadorInput.value = r.nomeOperador || '';
+  if (codigoOperadorInput) codigoOperadorInput.value = r.codigoOperador || '';
+  if (dataNascimentoInput) dataNascimentoInput.value = r.dataNascimento || '';
+  if (parceiroEquipeInput) parceiroEquipeInput.value = r.parceiroEquipe || '';
+  if (localOperacaoInput) localOperacaoInput.value = r.localOperacao || '';
+  if (cidadeUfInput) cidadeUfInput.value = r.cidadeUf || '';
+  if (dataInput) dataInput.value = r.data || '';
+  if (entradaInput) entradaInput.value = r.entrada || '';
+  if (almocoSaidaInput) almocoSaidaInput.value = r.almocoSaida || '';
+  if (almocoVoltaInput) almocoVoltaInput.value = r.almocoVolta || '';
+  if (pausaInicioInput) pausaInicioInput.value = r.pausaInicio || '';
+  if (pausaFimInput) pausaFimInput.value = r.pausaFim || '';
+  if (saidaInput) saidaInput.value = r.saida || '';
+  if (metaDiariaInput) metaDiariaInput.value = r.metaDiaria || '08:00';
+  if (turnoBaseInput) turnoBaseInput.value = r.turnoBase || '07:30 / 12:00 / 13:00 / 17:30';
+  if (observacaoInput) observacaoInput.value = r.observacao || '';
 
   atualizarPreview();
   window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -284,18 +294,15 @@ function editarRegistro(id) {
 
 function excluirRegistro(id) {
   if (!confirm('Deseja realmente excluir este registro?')) return;
-
   registros = registros.filter((item) => item.id !== id);
   salvarNoStorage();
   renderizarTudo();
 }
 
 function obterRegistrosFiltrados() {
-  const filtroMes = filtroMesInput ? filtroMesInput.value : '';
+  const filtroMes = valor(filtroMesInput);
   const lista = [...registros].sort((a, b) => obterDataInicial(b).getTime() - obterDataInicial(a).getTime());
-
-  if (!filtroMes) return lista;
-  return lista.filter((item) => String(item.data).startsWith(filtroMes));
+  return filtroMes ? lista.filter((item) => String(item.data).startsWith(filtroMes)) : lista;
 }
 
 function renderizarTudo() {
@@ -319,16 +326,12 @@ function renderizarTabela(lista) {
 
   tabelaRegistros.innerHTML = lista.map((registro) => {
     const calculo = calcularRegistro(registro);
-
-    const classeSaldo =
-      calculo.saldoMinutos > 0 ? 'text-positive' :
-      calculo.saldoMinutos < 0 ? 'text-negative' :
-      'text-warning';
-
-    const statusClasse =
-      calculo.saldoMinutos > 0 ? 'credito' :
-      calculo.saldoMinutos < 0 ? 'debito' :
-      'zerado';
+    const classeSaldo = calculo.valido
+      ? calculo.saldoMinutos > 0 ? 'text-positive' : calculo.saldoMinutos < 0 ? 'text-negative' : 'text-warning'
+      : 'text-warning';
+    const statusClasse = calculo.valido
+      ? calculo.saldoMinutos > 0 ? 'credito' : calculo.saldoMinutos < 0 ? 'debito' : 'zerado'
+      : 'zerado';
 
     return `
       <tr>
@@ -344,8 +347,8 @@ function renderizarTabela(lista) {
         <td>${escaparHTML(registro.pausaInicio || '-')}</td>
         <td>${escaparHTML(registro.pausaFim || '-')}</td>
         <td>${escaparHTML(registro.saida || '-')}</td>
-        <td>${formatarMinutos(calculo.horasTrabalhadasMinutos)}</td>
-        <td class="${classeSaldo}">${formatarMinutosAssinado(calculo.saldoMinutos)}</td>
+        <td>${calculo.valido ? formatarMinutos(calculo.horasTrabalhadasMinutos) : '--:--'}</td>
+        <td class="${classeSaldo}">${calculo.valido ? formatarMinutosAssinado(calculo.saldoMinutos) : '--:--'}</td>
         <td><span class="status-badge ${statusClasse}">${calculo.status}</span></td>
         <td>${escaparHTML(registro.observacao || '-')}</td>
         <td>
@@ -398,12 +401,12 @@ function atualizarPreview() {
     metaDiaria: normalizarHora(metaDiariaInput?.value) || '08:00'
   };
 
-  const calculo = calcularRegistro(registroTemporario, true);
+  const calculo = calcularRegistro(registroTemporario);
 
   if (!calculo.valido) {
-    if (previewHoras) previewHoras.textContent = '00:00';
-    if (previewSaldo) previewSaldo.textContent = '+00:00';
-    if (previewStatus) previewStatus.textContent = 'Aguardando dados';
+    if (previewHoras) previewHoras.textContent = '--:--';
+    if (previewSaldo) previewSaldo.textContent = '--:--';
+    if (previewStatus) previewStatus.textContent = calculo.status;
     if (previewSaldo) previewSaldo.className = '';
     return;
   }
@@ -420,43 +423,68 @@ function atualizarPreview() {
   }
 }
 
-function calcularRegistro(registro, silencioso = false) {
-  if (!registro.data || !registro.entrada || !registro.almocoSaida || !registro.almocoVolta || !registro.saida || !registro.metaDiaria) {
-    return { valido: false, erro: silencioso ? '' : 'Preencha todos os horários obrigatórios.' };
+function calcularRegistro(registro) {
+  const metaMinutos = converterHoraParaMinutos(registro.metaDiaria || '08:00');
+
+  const temEntrada = !!registro.entrada;
+  const temAlmocoSaida = !!registro.almocoSaida;
+  const temAlmocoVolta = !!registro.almocoVolta;
+  const temPausaInicio = !!registro.pausaInicio;
+  const temPausaFim = !!registro.pausaFim;
+  const temSaida = !!registro.saida;
+
+  if (!temEntrada) {
+    return { valido: false, status: 'Aguardando início', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
   }
 
-  const metaMinutos = converterHoraParaMinutos(registro.metaDiaria);
-  if (Number.isNaN(metaMinutos) || metaMinutos <= 0) {
-    return { valido: false, erro: silencioso ? '' : 'Meta diária inválida.' };
+  if (temPausaFim && !temPausaInicio) {
+    return { valido: false, status: 'Pausa incompleta', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
   }
 
-  const temPausa = !!registro.pausaInicio && !!registro.pausaFim;
-  const temPausaParcial = (!!registro.pausaInicio && !registro.pausaFim) || (!registro.pausaInicio && !!registro.pausaFim);
-
-  if (temPausaParcial) {
-    return { valido: false, erro: silencioso ? '' : 'Preencha início e fim da pausa extra.' };
+  if (temPausaInicio && !temPausaFim && temSaida) {
+    return { valido: false, status: 'Pausa incompleta', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
   }
 
-  const horarios = temPausa
+  if (!temAlmocoSaida) {
+    return { valido: false, status: 'Jornada iniciada', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  }
+
+  if (!temAlmocoVolta) {
+    return { valido: false, status: 'Em almoço', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  }
+
+  if (!temSaida && !temPausaInicio) {
+    return { valido: false, status: 'Jornada em andamento', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  }
+
+  if (temPausaInicio && !temPausaFim) {
+    return { valido: false, status: 'Pausa extra em andamento', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  }
+
+  if (!temSaida) {
+    return { valido: false, status: 'Aguardando saída', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  }
+
+  const horarios = temPausaInicio && temPausaFim
     ? [registro.entrada, registro.almocoSaida, registro.almocoVolta, registro.pausaInicio, registro.pausaFim, registro.saida]
     : [registro.entrada, registro.almocoSaida, registro.almocoVolta, registro.saida];
 
   const linhaTempo = criarLinhaDoTempo(registro.data, horarios);
 
   if (!linhaTempo.length || linhaTempo.length !== horarios.length) {
-    return { valido: false, erro: silencioso ? '' : 'Horários inválidos.' };
+    return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
   }
 
   let horasTrabalhadasMinutos = 0;
 
-  if (temPausa) {
+  if (temPausaInicio && temPausaFim) {
     const [entrada, almocoSaida, almocoVolta, pausaInicio, pausaFim, saida] = linhaTempo;
     const trecho1 = diferencaMinutos(entrada, almocoSaida);
     const trecho2 = diferencaMinutos(almocoVolta, pausaInicio);
     const trecho3 = diferencaMinutos(pausaFim, saida);
 
     if (trecho1 < 0 || trecho2 < 0 || trecho3 < 0) {
-      return { valido: false, erro: silencioso ? '' : 'Verifique os horários da pausa extra.' };
+      return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
     }
 
     horasTrabalhadasMinutos = trecho1 + trecho2 + trecho3;
@@ -466,7 +494,7 @@ function calcularRegistro(registro, silencioso = false) {
     const trecho2 = diferencaMinutos(almocoVolta, saida);
 
     if (trecho1 < 0 || trecho2 < 0) {
-      return { valido: false, erro: silencioso ? '' : 'Verifique os horários informados.' };
+      return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
     }
 
     horasTrabalhadasMinutos = trecho1 + trecho2;
@@ -477,10 +505,9 @@ function calcularRegistro(registro, silencioso = false) {
 
   return {
     valido: true,
-    metaMinutos,
+    status,
     horasTrabalhadasMinutos,
-    saldoMinutos,
-    status
+    saldoMinutos
   };
 }
 
@@ -543,7 +570,7 @@ function renderizarRelatorioImpressao(lista) {
     printResumoOperador.innerHTML = `
       <div class="print-kpi"><span>Operador</span><strong>${escaparHTML(operadorPrincipal)}</strong></div>
       <div class="print-kpi"><span>Código</span><strong>${escaparHTML(codigoPrincipal)}</strong></div>
-      <div class="print-kpi"><span>Total de dias</span><strong>${lista.length}</strong></div>
+      <div class="print-kpi"><span>Total de dias fechados</span><strong>${validos.length}</strong></div>
       <div class="print-kpi"><span>Horas trabalhadas</span><strong>${formatarMinutos(totalTrabalhado)}</strong></div>
       <div class="print-kpi"><span>Crédito</span><strong>${formatarMinutos(credito)}</strong></div>
       <div class="print-kpi"><span>Débito</span><strong>${formatarMinutos(debito)}</strong></div>
@@ -569,8 +596,8 @@ function renderizarRelatorioImpressao(lista) {
             <td>${escaparHTML(registro.pausaInicio || '-')}</td>
             <td>${escaparHTML(registro.pausaFim || '-')}</td>
             <td>${escaparHTML(registro.saida || '-')}</td>
-            <td>${formatarMinutos(calculo.horasTrabalhadasMinutos)}</td>
-            <td>${formatarMinutosAssinado(calculo.saldoMinutos)}</td>
+            <td>${calculo.valido ? formatarMinutos(calculo.horasTrabalhadasMinutos) : '--:--'}</td>
+            <td>${calculo.valido ? formatarMinutosAssinado(calculo.saldoMinutos) : '--:--'}</td>
             <td>${escaparHTML(registro.observacao || '-')}</td>
           </tr>
         `;
@@ -643,7 +670,7 @@ function exportarCSV() {
       registro.turnoBase || '',
       calculo.valido ? formatarMinutos(calculo.horasTrabalhadasMinutos) : '',
       calculo.valido ? formatarMinutosAssinado(calculo.saldoMinutos) : '',
-      calculo.valido ? calculo.status : '',
+      calculo.status || '',
       registro.observacao || ''
     ]);
   });
