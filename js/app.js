@@ -1,4 +1,4 @@
-const STORAGE_KEY = 'controle_ponto_campo_historico_ok_v1';
+const STORAGE_KEY = 'controle_ponto_campo_final_ok_v2';
 
 const byId = (id) => document.getElementById(id);
 
@@ -160,28 +160,19 @@ function salvarRegistro(evento) {
     observacao: valor(observacaoInput)
   };
 
-  const validacao = validarCamposBasicos(registro);
+  const validacao = validarRegistro(registro);
   if (!validacao.valido) {
     alert(validacao.erro);
     return;
   }
 
-  const validacaoSequencia = validarSequenciaParcial(registro);
-  if (!validacaoSequencia.valido) {
-    alert(validacaoSequencia.erro);
-    return;
-  }
-
-  const indiceMesmoDia = registros.findIndex(
+  const indice = registros.findIndex(
     (item) => item.data === registro.data && item.codigoOperador === registro.codigoOperador
   );
 
-  if (registro.id && registros.some((item) => item.id === registro.id)) {
-    const indiceId = registros.findIndex((item) => item.id === registro.id);
-    registros[indiceId] = registro;
-  } else if (indiceMesmoDia >= 0) {
-    registro.id = registros[indiceMesmoDia].id;
-    registros[indiceMesmoDia] = registro;
+  if (indice >= 0) {
+    registro.id = registros[indice].id;
+    registros[indice] = registro;
   } else {
     registros.push(registro);
   }
@@ -194,43 +185,27 @@ function salvarRegistro(evento) {
   alert('Ponto salvo com sucesso.');
 }
 
-function validarCamposBasicos(registro) {
+function validarRegistro(registro) {
   if (!registro.nomeOperador) return { valido: false, erro: 'Informe o nome do operador.' };
   if (!registro.codigoOperador) return { valido: false, erro: 'Informe o código ou matrícula.' };
   if (!registro.dataNascimento) return { valido: false, erro: 'Informe a data de nascimento.' };
   if (!registro.data) return { valido: false, erro: 'Informe a data de referência.' };
+  if (!registro.entrada) return { valido: false, erro: 'Informe pelo menos o início da jornada.' };
 
-  const pontos = [
-    registro.entrada,
-    registro.almocoSaida,
-    registro.almocoVolta,
-    registro.pausaInicio,
-    registro.pausaFim,
-    registro.saida
-  ].filter(Boolean);
-
-  if (!pontos.length) {
-    return { valido: false, erro: 'Informe pelo menos um ponto para salvar.' };
-  }
-
-  return { valido: true };
-}
-
-function validarSequenciaParcial(registro) {
   if (registro.almocoVolta && !registro.almocoSaida) {
-    return { valido: false, erro: 'Preencha primeiro a ida do almoço.' };
+    return { valido: false, erro: 'Preencha a ida do almoço antes da volta.' };
   }
 
   if (registro.pausaInicio && !registro.almocoVolta) {
-    return { valido: false, erro: 'Não é possível lançar pausa extra antes da volta do almoço.' };
+    return { valido: false, erro: 'A pausa extra só pode ocorrer depois da volta do almoço.' };
   }
 
   if (registro.pausaFim && !registro.pausaInicio) {
     return { valido: false, erro: 'Preencha o início da pausa extra antes do fim.' };
   }
 
-  if (registro.saida && registro.pausaInicio && !registro.pausaFim) {
-    return { valido: false, erro: 'Se houver pausa extra, preencha também o fim da pausa antes da saída.' };
+  if (registro.pausaInicio && registro.saida && !registro.pausaFim) {
+    return { valido: false, erro: 'Se houver pausa extra, informe também o fim da pausa antes da saída.' };
   }
 
   return { valido: true };
@@ -330,19 +305,11 @@ function renderizarTabela(lista) {
     const calculo = calcularRegistro(registro);
 
     const classeSaldo = calculo.valido
-      ? calculo.saldoMinutos > 0
-        ? 'text-positive'
-        : calculo.saldoMinutos < 0
-          ? 'text-negative'
-          : 'text-warning'
+      ? calculo.saldoMinutos > 0 ? 'text-positive' : calculo.saldoMinutos < 0 ? 'text-negative' : 'text-warning'
       : 'text-warning';
 
     const statusClasse = calculo.valido
-      ? calculo.saldoMinutos > 0
-        ? 'credito'
-        : calculo.saldoMinutos < 0
-          ? 'debito'
-          : 'zerado'
+      ? calculo.saldoMinutos > 0 ? 'credito' : calculo.saldoMinutos < 0 ? 'debito' : 'zerado'
       : 'zerado';
 
     return `
@@ -459,27 +426,16 @@ function calcularRegistro(registro) {
 
   if (temEntrada && temSaida && !temAlmocoSaida && !temAlmocoVolta && !temPausaInicio && !temPausaFim) {
     const linhaTempo = criarLinhaDoTempo(registro.data, [registro.entrada, registro.saida]);
-
-    if (!linhaTempo.length || linhaTempo.length !== 2) {
+    if (!linhaTempo.length) {
       return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
     }
 
     const [entrada, saida] = linhaTempo;
     const horasTrabalhadasMinutos = diferencaMinutos(entrada, saida);
-
-    if (horasTrabalhadasMinutos < 0) {
-      return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
-    }
-
     const saldoMinutos = horasTrabalhadasMinutos - metaMinutos;
     const status = saldoMinutos > 0 ? 'Crédito' : saldoMinutos < 0 ? 'Débito' : 'Zerado';
 
-    return {
-      valido: true,
-      status,
-      horasTrabalhadasMinutos,
-      saldoMinutos
-    };
+    return { valido: true, status, horasTrabalhadasMinutos, saldoMinutos };
   }
 
   if (!temAlmocoSaida) {
@@ -502,50 +458,52 @@ function calcularRegistro(registro) {
     return { valido: false, status: 'Aguardando saída', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
   }
 
-  const horarios = temPausaInicio && temPausaFim
-    ? [registro.entrada, registro.almocoSaida, registro.almocoVolta, registro.pausaInicio, registro.pausaFim, registro.saida]
-    : [registro.entrada, registro.almocoSaida, registro.almocoVolta, registro.saida];
+  if (temPausaInicio && temPausaFim) {
+    const linhaTempo = criarLinhaDoTempo(registro.data, [
+      registro.entrada,
+      registro.almocoSaida,
+      registro.almocoVolta,
+      registro.pausaInicio,
+      registro.pausaFim,
+      registro.saida
+    ]);
 
-  const linhaTempo = criarLinhaDoTempo(registro.data, horarios);
+    if (!linhaTempo.length) {
+      return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+    }
 
-  if (!linhaTempo.length || linhaTempo.length !== horarios.length) {
+    const [entrada, almocoSaida, almocoVolta, pausaInicio, pausaFim, saida] = linhaTempo;
+    const horasTrabalhadasMinutos =
+      diferencaMinutos(entrada, almocoSaida) +
+      diferencaMinutos(almocoVolta, pausaInicio) +
+      diferencaMinutos(pausaFim, saida);
+
+    const saldoMinutos = horasTrabalhadasMinutos - metaMinutos;
+    const status = saldoMinutos > 0 ? 'Crédito' : saldoMinutos < 0 ? 'Débito' : 'Zerado';
+
+    return { valido: true, status, horasTrabalhadasMinutos, saldoMinutos };
+  }
+
+  const linhaTempo = criarLinhaDoTempo(registro.data, [
+    registro.entrada,
+    registro.almocoSaida,
+    registro.almocoVolta,
+    registro.saida
+  ]);
+
+  if (!linhaTempo.length) {
     return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
   }
 
-  let horasTrabalhadasMinutos = 0;
-
-  if (temPausaInicio && temPausaFim) {
-    const [entrada, almocoSaida, almocoVolta, pausaInicio, pausaFim, saida] = linhaTempo;
-    const trecho1 = diferencaMinutos(entrada, almocoSaida);
-    const trecho2 = diferencaMinutos(almocoVolta, pausaInicio);
-    const trecho3 = diferencaMinutos(pausaFim, saida);
-
-    if (trecho1 < 0 || trecho2 < 0 || trecho3 < 0) {
-      return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
-    }
-
-    horasTrabalhadasMinutos = trecho1 + trecho2 + trecho3;
-  } else {
-    const [entrada, almocoSaida, almocoVolta, saida] = linhaTempo;
-    const trecho1 = diferencaMinutos(entrada, almocoSaida);
-    const trecho2 = diferencaMinutos(almocoVolta, saida);
-
-    if (trecho1 < 0 || trecho2 < 0) {
-      return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
-    }
-
-    horasTrabalhadasMinutos = trecho1 + trecho2;
-  }
+  const [entrada, almocoSaida, almocoVolta, saida] = linhaTempo;
+  const horasTrabalhadasMinutos =
+    diferencaMinutos(entrada, almocoSaida) +
+    diferencaMinutos(almocoVolta, saida);
 
   const saldoMinutos = horasTrabalhadasMinutos - metaMinutos;
   const status = saldoMinutos > 0 ? 'Crédito' : saldoMinutos < 0 ? 'Débito' : 'Zerado';
 
-  return {
-    valido: true,
-    status,
-    horasTrabalhadasMinutos,
-    saldoMinutos
-  };
+  return { valido: true, status, horasTrabalhadasMinutos, saldoMinutos };
 }
 
 function criarLinhaDoTempo(dataBase, horarios) {
@@ -559,8 +517,6 @@ function criarLinhaDoTempo(dataBase, horarios) {
     if (!horario || !horario.includes(':')) return [];
 
     const [hora, minuto] = horario.split(':').map(Number);
-    if (Number.isNaN(hora) || Number.isNaN(minuto)) return [];
-
     const dataHora = new Date(base);
     dataHora.setHours(hora, minuto, 0, 0);
 
