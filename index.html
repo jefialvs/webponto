@@ -15,7 +15,7 @@
         <p class="hero-text">
           Registre sua jornada com almoço e pausa extra opcional.
           O sistema calcula horas trabalhadas, saldo diário, banco de horas
-          e gera relatório profissional para impressão.
+          e gera relatório para impressão.
         </p>
       </div>
 
@@ -31,12 +31,12 @@
         <div class="section-header">
           <div>
             <h2>Lançar ponto do dia</h2>
-            <p>Preencha conforme o app da empresa: início, almoço, pausa extra opcional e jornada finalizada.</p>
+            <p>Preencha os horários reais do dia.</p>
           </div>
           <button id="btnNovoRegistro" class="ghost-btn" type="button">Novo registro</button>
         </div>
 
-        <form id="pontoForm" class="form-grid">
+        <form id="pontoForm" class="form-grid" novalidate>
           <input type="hidden" id="registroId" />
 
           <label>
@@ -121,7 +121,7 @@
 
           <label>
             <span>Meta diária</span>
-            <input type="time" id="metaDiaria" value="08:00" required />
+            <input type="time" id="metaDiaria" value="08:00" />
           </label>
 
           <label>
@@ -131,12 +131,15 @@
 
           <label class="full-width">
             <span>Observação</span>
-            <input type="text" id="observacao" maxlength="180" placeholder="Ex.: viagem longa, pausa operacional, deslocamento..." />
+            <input type="text" id="observacao" maxlength="180" placeholder="Ex.: saída antecipada, viagem longa, pausa operacional..." />
           </label>
 
           <div class="full-width hint">
-            Se houver pausa extra, preencha início e fim. Se não houver, deixe os dois campos em branco.
             Campo vazio (<strong>--:--</strong>) é ignorado. Já <strong>00:00</strong> conta como meia-noite.
+            Você pode lançar:
+            <strong>entrada + saída</strong> sem almoço,
+            <strong>entrada + almoço + saída</strong>,
+            ou <strong>entrada + almoço + pausa extra + saída</strong>.
           </div>
 
           <div class="preview-box full-width">
