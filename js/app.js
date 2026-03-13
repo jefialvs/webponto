@@ -1,790 +1,661 @@
-const STORAGE_KEY = 'controle_ponto_campo_final_ok_v2';
-
-const byId = (id) => document.getElementById(id);
-
-const form = byId('pontoForm');
-const registroId = byId('registroId');
-
-const empresaNomeInput = byId('empresaNome');
-const empresaCnpjInput = byId('empresaCnpj');
-const responsavelNomeInput = byId('responsavelNome');
-
-const nomeOperadorInput = byId('nomeOperador');
-const codigoOperadorInput = byId('codigoOperador');
-const dataNascimentoInput = byId('dataNascimento');
-const parceiroEquipeInput = byId('parceiroEquipe');
-const localOperacaoInput = byId('localOperacao');
-const cidadeUfInput = byId('cidadeUf');
-
-const dataInput = byId('data');
-const entradaInput = byId('entrada');
-const almocoSaidaInput = byId('almocoSaida');
-const almocoVoltaInput = byId('almocoVolta');
-const pausaInicioInput = byId('pausaInicio');
-const pausaFimInput = byId('pausaFim');
-const saidaInput = byId('saida');
-const metaDiariaInput = byId('metaDiaria');
-const turnoBaseInput = byId('turnoBase');
-const observacaoInput = byId('observacao');
-
-const filtroMesInput = byId('filtroMes');
-const tabelaRegistros = byId('tabelaRegistros');
-
-const previewHoras = byId('previewHoras');
-const previewSaldo = byId('previewSaldo');
-const previewStatus = byId('previewStatus');
-
-const totalDias = byId('totalDias');
-const totalHoras = byId('totalHoras');
-const bancoPositivo = byId('bancoPositivo');
-const bancoNegativo = byId('bancoNegativo');
-const saldoBanco = byId('saldoBanco');
-const diasBanco = byId('diasBanco');
-const faltamParaDia = byId('faltamParaDia');
-const mediaDia = byId('mediaDia');
-const heroSaldo = byId('heroSaldo');
-
-const btnLimpar = byId('btnLimpar');
-const btnLimparTudo = byId('btnLimparTudo');
-const btnNovoRegistro = byId('btnNovoRegistro');
-const btnExportar = byId('btnExportar');
-const btnImprimir = byId('btnImprimir');
-
-const printEmpresaNome = byId('printEmpresaNome');
-const printEmpresaCnpj = byId('printEmpresaCnpj');
-const printPeriodo = byId('printPeriodo');
-const printGeradoEm = byId('printGeradoEm');
-const printResumoOperador = byId('printResumoOperador');
-const printTabela = byId('printTabela');
-const printTurnoBase = byId('printTurnoBase');
-const printMetaDiaria = byId('printMetaDiaria');
-const printAssinaturaOperador = byId('printAssinaturaOperador');
-const printAssinaturaResponsavel = byId('printAssinaturaResponsavel');
-
-let registros = carregarRegistros();
-
-iniciar();
-
-function iniciar() {
-  definirDataAtual();
-  definirMesAtual();
-
-  if (empresaNomeInput && !empresaNomeInput.value) empresaNomeInput.value = 'Nome da Empresa';
-  if (empresaCnpjInput && !empresaCnpjInput.value) empresaCnpjInput.value = '00.000.000/0001-00';
-  if (responsavelNomeInput && !responsavelNomeInput.value) responsavelNomeInput.value = 'Responsável / Conferência';
-  if (metaDiariaInput && !metaDiariaInput.value) metaDiariaInput.value = '08:00';
-  if (turnoBaseInput && !turnoBaseInput.value) turnoBaseInput.value = '07:30 / 12:00 / 13:00 / 17:30';
-
-  atualizarPreview();
-  renderizarTudo();
-
-  form?.addEventListener('submit', salvarRegistro);
-  btnLimpar?.addEventListener('click', limparFormulario);
-  btnNovoRegistro?.addEventListener('click', limparFormulario);
-  btnLimparTudo?.addEventListener('click', apagarTudo);
-  btnExportar?.addEventListener('click', exportarCSV);
-  btnImprimir?.addEventListener('click', imprimirRelatorio);
-  filtroMesInput?.addEventListener('input', renderizarTudo);
-
-  [
-    empresaNomeInput,
-    empresaCnpjInput,
-    responsavelNomeInput,
-    nomeOperadorInput,
-    codigoOperadorInput,
-    dataNascimentoInput,
-    parceiroEquipeInput,
-    localOperacaoInput,
-    cidadeUfInput,
-    dataInput,
-    entradaInput,
-    almocoSaidaInput,
-    almocoVoltaInput,
-    pausaInicioInput,
-    pausaFimInput,
-    saidaInput,
-    metaDiariaInput,
-    turnoBaseInput,
-    observacaoInput
-  ].forEach((campo) => {
-    campo?.addEventListener('input', atualizarPreview);
-    campo?.addEventListener('change', atualizarPreview);
-  });
+:root {
+  --bg: #08111f;
+  --bg-2: #0f1a2b;
+  --panel: rgba(14, 24, 41, 0.96);
+  --panel-2: #12213a;
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(255, 255, 255, 0.14);
+  --text: #e9eef8;
+  --muted: #98a6bf;
+  --primary: #4ea8ff;
+  --primary-2: #1f6feb;
+  --shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  --radius: 22px;
 }
 
-function carregarRegistros() {
-  try {
-    const dados = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return Array.isArray(dados) ? dados : [];
-  } catch {
-    return [];
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(circle at top right, rgba(78, 168, 255, 0.14), transparent 28%),
+    linear-gradient(180deg, #07101d 0%, #0a1526 100%);
+  color: var(--text);
+  font-family: Inter, "Segoe UI", Arial, sans-serif;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+.app-shell {
+  width: min(1800px, calc(100% - 24px));
+  margin: 16px auto 30px;
+}
+
+.hero,
+.card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+}
+
+.hero {
+  padding: 24px;
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+
+.eyebrow {
+  margin: 0 0 8px;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(26px, 4vw, 40px);
+}
+
+.hero-text {
+  max-width: 760px;
+  color: var(--muted);
+  margin: 12px 0 0;
+  line-height: 1.6;
+}
+
+.hero-badge {
+  min-width: 250px;
+  padding: 20px;
+  border-radius: 18px;
+  background: linear-gradient(180deg, rgba(78, 168, 255, 0.18), rgba(31, 111, 235, 0.08));
+  border: 1px solid rgba(78, 168, 255, 0.22);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+}
+
+.hero-badge span,
+.hero-badge small,
+.section-header p,
+.preview-box small,
+label span,
+.hint {
+  color: var(--muted);
+}
+
+.hero-badge strong {
+  font-size: 34px;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+.card {
+  padding: 20px;
+}
+
+.section-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.section-header.compact {
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  margin: 0 0 6px;
+  font-size: 22px;
+}
+
+.section-header p {
+  margin: 0;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+input {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: #0b1729;
+  color: var(--text);
+  outline: none;
+  transition: 0.2s ease;
+}
+
+input:focus {
+  border-color: rgba(78, 168, 255, 0.8);
+  box-shadow: 0 0 0 4px rgba(78, 168, 255, 0.14);
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.preview-box {
+  background: linear-gradient(180deg, rgba(78, 168, 255, 0.08), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.preview-box strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 24px;
+}
+
+.form-actions,
+.toolbar {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: end;
+}
+
+button {
+  border: 0;
+  cursor: pointer;
+  border-radius: 14px;
+  padding: 12px 16px;
+  font-weight: 700;
+  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.primary-btn {
+  background: linear-gradient(180deg, var(--primary), var(--primary-2));
+  color: white;
+  box-shadow: 0 12px 24px rgba(31, 111, 235, 0.28);
+}
+
+.secondary-btn,
+.ghost-btn {
+  background: #16243d;
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.ghost-btn {
+  background: transparent;
+}
+
+.danger-btn {
+  background: rgba(255, 107, 107, 0.12);
+  color: #ffc9c9;
+  border: 1px solid rgba(255, 107, 107, 0.22);
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.stat-box {
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.stat-box span {
+  color: var(--muted);
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.stat-box strong {
+  font-size: 28px;
+}
+
+.stat-box.positive {
+  border-color: rgba(57, 217, 138, 0.22);
+}
+
+.stat-box.negative {
+  border-color: rgba(255, 107, 107, 0.22);
+}
+
+.stat-box.highlight {
+  background: linear-gradient(180deg, rgba(78, 168, 255, 0.16), rgba(31, 111, 235, 0.06));
+  border-color: rgba(78, 168, 255, 0.24);
+}
+
+.table-wrapper {
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 1850px;
+}
+
+th,
+td {
+  padding: 14px 12px;
+  border-bottom: 1px solid var(--line);
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+th {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.status-badge.credito {
+  background: rgba(57, 217, 138, 0.14);
+  color: #8af0b9;
+}
+
+.status-badge.debito {
+  background: rgba(255, 107, 107, 0.14);
+  color: #ffc0c0;
+}
+
+.status-badge.zerado {
+  background: rgba(255, 207, 90, 0.12);
+  color: #ffe08a;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.row-actions button {
+  padding: 9px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.empty-state {
+  text-align: center;
+  color: var(--muted);
+  padding: 26px 12px;
+}
+
+.text-positive {
+  color: #8af0b9;
+}
+
+.text-negative {
+  color: #ffb1b1;
+}
+
+.text-warning {
+  color: #ffe08a;
+}
+
+.print-area {
+  display: none;
+}
+
+@media (max-width: 1200px) {
+  .form-grid,
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-function salvarNoStorage() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(registros));
-}
-
-function valor(el) {
-  return el ? String(el.value || '').trim() : '';
-}
-
-function normalizarHora(v) {
-  const texto = String(v || '').trim();
-  return texto === '' ? '' : texto;
-}
-
-function salvarRegistro(evento) {
-  evento.preventDefault();
-
-  const registro = {
-    id: valor(registroId) || gerarIdSeguro(),
-    empresaNome: valor(empresaNomeInput),
-    empresaCnpj: valor(empresaCnpjInput),
-    responsavelNome: valor(responsavelNomeInput),
-    nomeOperador: valor(nomeOperadorInput),
-    codigoOperador: valor(codigoOperadorInput),
-    dataNascimento: valor(dataNascimentoInput),
-    parceiroEquipe: valor(parceiroEquipeInput),
-    localOperacao: valor(localOperacaoInput),
-    cidadeUf: valor(cidadeUfInput),
-    data: valor(dataInput),
-    entrada: normalizarHora(entradaInput?.value),
-    almocoSaida: normalizarHora(almocoSaidaInput?.value),
-    almocoVolta: normalizarHora(almocoVoltaInput?.value),
-    pausaInicio: normalizarHora(pausaInicioInput?.value),
-    pausaFim: normalizarHora(pausaFimInput?.value),
-    saida: normalizarHora(saidaInput?.value),
-    metaDiaria: normalizarHora(metaDiariaInput?.value) || '08:00',
-    turnoBase: valor(turnoBaseInput) || '07:30 / 12:00 / 13:00 / 17:30',
-    observacao: valor(observacaoInput)
-  };
-
-  const validacao = validarRegistro(registro);
-  if (!validacao.valido) {
-    alert(validacao.erro);
-    return;
+@media (max-width: 860px) {
+  .hero {
+    flex-direction: column;
   }
 
-  const indice = registros.findIndex(
-    (item) => item.data === registro.data && item.codigoOperador === registro.codigoOperador
-  );
-
-  if (indice >= 0) {
-    registro.id = registros[indice].id;
-    registros[indice] = registro;
-  } else {
-    registros.push(registro);
+  .form-grid,
+  .preview-box,
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 
-  salvarNoStorage();
-  registros = carregarRegistros();
-  renderizarTudo();
-  limparFormulario();
-
-  alert('Ponto salvo com sucesso.');
-}
-
-function validarRegistro(registro) {
-  if (!registro.nomeOperador) return { valido: false, erro: 'Informe o nome do operador.' };
-  if (!registro.codigoOperador) return { valido: false, erro: 'Informe o código ou matrícula.' };
-  if (!registro.dataNascimento) return { valido: false, erro: 'Informe a data de nascimento.' };
-  if (!registro.data) return { valido: false, erro: 'Informe a data de referência.' };
-  if (!registro.entrada) return { valido: false, erro: 'Informe pelo menos o início da jornada.' };
-
-  if (registro.almocoVolta && !registro.almocoSaida) {
-    return { valido: false, erro: 'Preencha a ida do almoço antes da volta.' };
+  .toolbar,
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
   }
 
-  if (registro.pausaInicio && !registro.almocoVolta) {
-    return { valido: false, erro: 'A pausa extra só pode ocorrer depois da volta do almoço.' };
+  .app-shell {
+    width: min(100% - 12px, 1800px);
+    margin-top: 10px;
   }
 
-  if (registro.pausaFim && !registro.pausaInicio) {
-    return { valido: false, erro: 'Preencha o início da pausa extra antes do fim.' };
-  }
-
-  if (registro.pausaInicio && registro.saida && !registro.pausaFim) {
-    return { valido: false, erro: 'Se houver pausa extra, informe também o fim da pausa antes da saída.' };
-  }
-
-  return { valido: true };
-}
-
-function limparFormulario() {
-  form?.reset();
-
-  if (registroId) registroId.value = '';
-  if (empresaNomeInput) empresaNomeInput.value = 'Nome da Empresa';
-  if (empresaCnpjInput) empresaCnpjInput.value = '00.000.000/0001-00';
-  if (responsavelNomeInput) responsavelNomeInput.value = 'Responsável / Conferência';
-  if (metaDiariaInput) metaDiariaInput.value = '08:00';
-  if (turnoBaseInput) turnoBaseInput.value = '07:30 / 12:00 / 13:00 / 17:30';
-
-  definirDataAtual();
-  atualizarPreview();
-}
-
-function apagarTudo() {
-  if (!registros.length) {
-    alert('Não há registros para apagar.');
-    return;
-  }
-
-  if (!confirm('Tem certeza que deseja apagar todos os registros?')) return;
-
-  registros = [];
-  salvarNoStorage();
-  renderizarTudo();
-  limparFormulario();
-}
-
-function editarRegistro(id) {
-  const r = registros.find((item) => item.id === id);
-  if (!r) return;
-
-  if (registroId) registroId.value = r.id;
-  if (empresaNomeInput) empresaNomeInput.value = r.empresaNome || 'Nome da Empresa';
-  if (empresaCnpjInput) empresaCnpjInput.value = r.empresaCnpj || '00.000.000/0001-00';
-  if (responsavelNomeInput) responsavelNomeInput.value = r.responsavelNome || 'Responsável / Conferência';
-  if (nomeOperadorInput) nomeOperadorInput.value = r.nomeOperador || '';
-  if (codigoOperadorInput) codigoOperadorInput.value = r.codigoOperador || '';
-  if (dataNascimentoInput) dataNascimentoInput.value = r.dataNascimento || '';
-  if (parceiroEquipeInput) parceiroEquipeInput.value = r.parceiroEquipe || '';
-  if (localOperacaoInput) localOperacaoInput.value = r.localOperacao || '';
-  if (cidadeUfInput) cidadeUfInput.value = r.cidadeUf || '';
-  if (dataInput) dataInput.value = r.data || '';
-  if (entradaInput) entradaInput.value = r.entrada || '';
-  if (almocoSaidaInput) almocoSaidaInput.value = r.almocoSaida || '';
-  if (almocoVoltaInput) almocoVoltaInput.value = r.almocoVolta || '';
-  if (pausaInicioInput) pausaInicioInput.value = r.pausaInicio || '';
-  if (pausaFimInput) pausaFimInput.value = r.pausaFim || '';
-  if (saidaInput) saidaInput.value = r.saida || '';
-  if (metaDiariaInput) metaDiariaInput.value = r.metaDiaria || '08:00';
-  if (turnoBaseInput) turnoBaseInput.value = r.turnoBase || '07:30 / 12:00 / 13:00 / 17:30';
-  if (observacaoInput) observacaoInput.value = r.observacao || '';
-
-  atualizarPreview();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-function excluirRegistro(id) {
-  if (!confirm('Deseja realmente excluir este registro?')) return;
-  registros = registros.filter((item) => item.id !== id);
-  salvarNoStorage();
-  renderizarTudo();
-}
-
-function obterRegistrosFiltrados() {
-  const filtroMes = valor(filtroMesInput);
-  const lista = [...registros].sort((a, b) => obterDataInicial(b).getTime() - obterDataInicial(a).getTime());
-  return filtroMes ? lista.filter((item) => String(item.data).startsWith(filtroMes)) : lista;
-}
-
-function renderizarTudo() {
-  registros = carregarRegistros();
-  const filtrados = obterRegistrosFiltrados();
-  renderizarTabela(filtrados);
-  renderizarResumo(filtrados);
-  renderizarRelatorioImpressao(filtrados);
-}
-
-function renderizarTabela(lista) {
-  if (!tabelaRegistros) return;
-
-  if (!lista.length) {
-    tabelaRegistros.innerHTML = `
-      <tr>
-        <td colspan="17" class="empty-state">Nenhum registro encontrado para o período selecionado.</td>
-      </tr>
-    `;
-    return;
-  }
-
-  tabelaRegistros.innerHTML = lista.map((registro) => {
-    const calculo = calcularRegistro(registro);
-
-    const classeSaldo = calculo.valido
-      ? calculo.saldoMinutos > 0 ? 'text-positive' : calculo.saldoMinutos < 0 ? 'text-negative' : 'text-warning'
-      : 'text-warning';
-
-    const statusClasse = calculo.valido
-      ? calculo.saldoMinutos > 0 ? 'credito' : calculo.saldoMinutos < 0 ? 'debito' : 'zerado'
-      : 'zerado';
-
-    return `
-      <tr>
-        <td>${formatarDataBR(registro.data)}</td>
-        <td>${escaparHTML(registro.nomeOperador || '-')}</td>
-        <td>${escaparHTML(registro.codigoOperador || '-')}</td>
-        <td>${escaparHTML(registro.parceiroEquipe || '-')}</td>
-        <td>${escaparHTML(registro.localOperacao || '-')}</td>
-        <td>${escaparHTML(registro.cidadeUf || '-')}</td>
-        <td>${escaparHTML(registro.entrada || '-')}</td>
-        <td>${escaparHTML(registro.almocoSaida || '-')}</td>
-        <td>${escaparHTML(registro.almocoVolta || '-')}</td>
-        <td>${escaparHTML(registro.pausaInicio || '-')}</td>
-        <td>${escaparHTML(registro.pausaFim || '-')}</td>
-        <td>${escaparHTML(registro.saida || '-')}</td>
-        <td>${calculo.valido ? formatarMinutos(calculo.horasTrabalhadasMinutos) : '--:--'}</td>
-        <td class="${classeSaldo}">${calculo.valido ? formatarMinutosAssinado(calculo.saldoMinutos) : '--:--'}</td>
-        <td><span class="status-badge ${statusClasse}">${calculo.status}</span></td>
-        <td>${escaparHTML(registro.observacao || '-')}</td>
-        <td>
-          <div class="row-actions">
-            <button class="secondary-btn" type="button" onclick="editarRegistro('${registro.id}')">Editar</button>
-            <button class="danger-btn" type="button" onclick="excluirRegistro('${registro.id}')">Excluir</button>
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function renderizarResumo(lista) {
-  const calculados = lista.map(calcularRegistro).filter((item) => item.valido);
-
-  const dias = calculados.length;
-  const totalTrabalhado = somar(calculados.map((item) => item.horasTrabalhadasMinutos));
-  const saldo = somar(calculados.map((item) => item.saldoMinutos));
-  const positivo = somar(calculados.filter((item) => item.saldoMinutos > 0).map((item) => item.saldoMinutos));
-  const negativo = somar(calculados.filter((item) => item.saldoMinutos < 0).map((item) => Math.abs(item.saldoMinutos)));
-  const diasFechados = saldo > 0 ? Math.floor(saldo / 1440) : 0;
-  const restoPositivo = saldo > 0 ? saldo % 1440 : 0;
-  const faltam = saldo > 0 ? (restoPositivo === 0 ? 0 : 1440 - restoPositivo) : 1440;
-  const media = dias ? Math.round(totalTrabalhado / dias) : 0;
-
-  if (totalDias) totalDias.textContent = String(dias);
-  if (totalHoras) totalHoras.textContent = formatarMinutos(totalTrabalhado);
-  if (bancoPositivo) bancoPositivo.textContent = formatarMinutos(positivo);
-  if (bancoNegativo) bancoNegativo.textContent = formatarMinutos(negativo);
-  if (saldoBanco) saldoBanco.textContent = formatarMinutosAssinado(saldo);
-  if (diasBanco) diasBanco.textContent = String(diasFechados);
-  if (faltamParaDia) faltamParaDia.textContent = formatarMinutos(faltam);
-  if (mediaDia) mediaDia.textContent = formatarMinutos(media);
-  if (heroSaldo) heroSaldo.textContent = formatarMinutosAssinado(saldo);
-
-  if (saldoBanco) saldoBanco.className = saldo > 0 ? 'text-positive' : saldo < 0 ? 'text-negative' : 'text-warning';
-  if (heroSaldo) heroSaldo.className = saldo > 0 ? 'text-positive' : saldo < 0 ? 'text-negative' : 'text-warning';
-}
-
-function atualizarPreview() {
-  const registroTemporario = {
-    data: valor(dataInput),
-    entrada: normalizarHora(entradaInput?.value),
-    almocoSaida: normalizarHora(almocoSaidaInput?.value),
-    almocoVolta: normalizarHora(almocoVoltaInput?.value),
-    pausaInicio: normalizarHora(pausaInicioInput?.value),
-    pausaFim: normalizarHora(pausaFimInput?.value),
-    saida: normalizarHora(saidaInput?.value),
-    metaDiaria: normalizarHora(metaDiariaInput?.value) || '08:00'
-  };
-
-  const calculo = calcularRegistro(registroTemporario);
-
-  if (!calculo.valido) {
-    if (previewHoras) previewHoras.textContent = '--:--';
-    if (previewSaldo) previewSaldo.textContent = '--:--';
-    if (previewStatus) previewStatus.textContent = calculo.status;
-    if (previewSaldo) previewSaldo.className = '';
-    return;
-  }
-
-  if (previewHoras) previewHoras.textContent = formatarMinutos(calculo.horasTrabalhadasMinutos);
-  if (previewSaldo) previewSaldo.textContent = formatarMinutosAssinado(calculo.saldoMinutos);
-  if (previewStatus) previewStatus.textContent = calculo.status;
-
-  if (previewSaldo) {
-    previewSaldo.className =
-      calculo.saldoMinutos > 0 ? 'text-positive' :
-      calculo.saldoMinutos < 0 ? 'text-negative' :
-      'text-warning';
+  .card,
+  .hero {
+    padding: 16px;
+    border-radius: 18px;
   }
 }
 
-function calcularRegistro(registro) {
-  const metaMinutos = converterHoraParaMinutos(registro.metaDiaria || '08:00');
-
-  const temEntrada = !!registro.entrada;
-  const temAlmocoSaida = !!registro.almocoSaida;
-  const temAlmocoVolta = !!registro.almocoVolta;
-  const temPausaInicio = !!registro.pausaInicio;
-  const temPausaFim = !!registro.pausaFim;
-  const temSaida = !!registro.saida;
-
-  if (!temEntrada) {
-    return { valido: false, status: 'Aguardando início', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 10mm;
   }
 
-  if (temPausaFim && !temPausaInicio) {
-    return { valido: false, status: 'Pausa incompleta', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  html,
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+    font-family: Arial, Helvetica, sans-serif;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
   }
 
-  if (temPausaInicio && !temPausaFim && temSaida) {
-    return { valido: false, status: 'Pausa incompleta', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  .no-print {
+    display: none !important;
   }
 
-  if (temEntrada && temSaida && !temAlmocoSaida && !temAlmocoVolta && !temPausaInicio && !temPausaFim) {
-    const linhaTempo = criarLinhaDoTempo(registro.data, [registro.entrada, registro.saida]);
-    if (!linhaTempo.length) {
-      return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
-    }
-
-    const [entrada, saida] = linhaTempo;
-    const horasTrabalhadasMinutos = diferencaMinutos(entrada, saida);
-    const saldoMinutos = horasTrabalhadasMinutos - metaMinutos;
-    const status = saldoMinutos > 0 ? 'Crédito' : saldoMinutos < 0 ? 'Débito' : 'Zerado';
-
-    return { valido: true, status, horasTrabalhadasMinutos, saldoMinutos };
+  .print-area {
+    display: block !important;
+    width: 100%;
+    color: #111827;
   }
 
-  if (!temAlmocoSaida) {
-    return { valido: false, status: 'Jornada iniciada', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  .print-document {
+    width: 100%;
   }
 
-  if (!temAlmocoVolta) {
-    return { valido: false, status: 'Em almoço', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  .print-header,
+  .print-summary-section,
+  .print-info-grid-wrap,
+  .print-footer {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
-  if (!temSaida && !temPausaInicio) {
-    return { valido: false, status: 'Jornada em andamento', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  .print-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    padding: 0 0 12px;
+    border-bottom: 2px solid #1d4ed8;
+    margin-bottom: 14px;
   }
 
-  if (temPausaInicio && !temPausaFim) {
-    return { valido: false, status: 'Pausa extra em andamento', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  .print-brand {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
   }
 
-  if (!temSaida) {
-    return { valido: false, status: 'Aguardando saída', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  .print-brand-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    background: #1d4ed8;
+    color: #fff;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex: 0 0 44px;
   }
 
-  if (temPausaInicio && temPausaFim) {
-    const linhaTempo = criarLinhaDoTempo(registro.data, [
-      registro.entrada,
-      registro.almocoSaida,
-      registro.almocoVolta,
-      registro.pausaInicio,
-      registro.pausaFim,
-      registro.saida
-    ]);
-
-    if (!linhaTempo.length) {
-      return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
-    }
-
-    const [entrada, almocoSaida, almocoVolta, pausaInicio, pausaFim, saida] = linhaTempo;
-    const horasTrabalhadasMinutos =
-      diferencaMinutos(entrada, almocoSaida) +
-      diferencaMinutos(almocoVolta, pausaInicio) +
-      diferencaMinutos(pausaFim, saida);
-
-    const saldoMinutos = horasTrabalhadasMinutos - metaMinutos;
-    const status = saldoMinutos > 0 ? 'Crédito' : saldoMinutos < 0 ? 'Débito' : 'Zerado';
-
-    return { valido: true, status, horasTrabalhadasMinutos, saldoMinutos };
+  .print-header h1 {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.2;
+    color: #0f172a;
   }
 
-  const linhaTempo = criarLinhaDoTempo(registro.data, [
-    registro.entrada,
-    registro.almocoSaida,
-    registro.almocoVolta,
-    registro.saida
-  ]);
-
-  if (!linhaTempo.length) {
-    return { valido: false, status: 'Horários inválidos', horasTrabalhadasMinutos: 0, saldoMinutos: 0 };
+  .print-header p {
+    margin: 4px 0 0;
+    font-size: 11px;
+    color: #475569;
   }
 
-  const [entrada, almocoSaida, almocoVolta, saida] = linhaTempo;
-  const horasTrabalhadasMinutos =
-    diferencaMinutos(entrada, almocoSaida) +
-    diferencaMinutos(almocoVolta, saida);
-
-  const saldoMinutos = horasTrabalhadasMinutos - metaMinutos;
-  const status = saldoMinutos > 0 ? 'Crédito' : saldoMinutos < 0 ? 'Débito' : 'Zerado';
-
-  return { valido: true, status, horasTrabalhadasMinutos, saldoMinutos };
-}
-
-function criarLinhaDoTempo(dataBase, horarios) {
-  const base = new Date(`${dataBase}T00:00:00`);
-  if (Number.isNaN(base.getTime())) return [];
-
-  const resultado = [];
-
-  for (let i = 0; i < horarios.length; i++) {
-    const horario = horarios[i];
-    if (!horario || !horario.includes(':')) return [];
-
-    const [hora, minuto] = horario.split(':').map(Number);
-    const dataHora = new Date(base);
-    dataHora.setHours(hora, minuto, 0, 0);
-
-    if (i > 0) {
-      while (dataHora <= resultado[i - 1]) {
-        dataHora.setDate(dataHora.getDate() + 1);
-      }
-    }
-
-    resultado.push(dataHora);
+  .print-subtitle {
+    font-weight: 700;
+    color: #1e293b;
   }
 
-  return resultado;
-}
-
-function renderizarRelatorioImpressao(lista) {
-  try {
-    if (!printResumoOperador || !printTabela) return;
-
-    const calculados = lista.map((registro) => ({
-      ...registro,
-      calculo: calcularRegistro(registro)
-    }));
-
-    const validos = calculados.filter((item) => item.calculo.valido);
-    const totalTrabalhado = somar(validos.map((item) => item.calculo.horasTrabalhadasMinutos));
-    const saldo = somar(validos.map((item) => item.calculo.saldoMinutos));
-    const credito = somar(validos.filter((item) => item.calculo.saldoMinutos > 0).map((item) => item.calculo.saldoMinutos));
-    const debito = somar(validos.filter((item) => item.calculo.saldoMinutos < 0).map((item) => Math.abs(item.calculo.saldoMinutos)));
-
-    const primeiro = lista[0] || {};
-    const operadorPrincipal = primeiro.nomeOperador || 'Não informado';
-    const codigoPrincipal = primeiro.codigoOperador || 'Não informado';
-
-    if (printEmpresaNome) printEmpresaNome.textContent = primeiro.empresaNome || valor(empresaNomeInput) || 'Nome da Empresa';
-    if (printEmpresaCnpj) printEmpresaCnpj.textContent = `CNPJ: ${primeiro.empresaCnpj || valor(empresaCnpjInput) || '00.000.000/0001-00'}`;
-    if (printPeriodo) {
-      printPeriodo.textContent = filtroMesInput && filtroMesInput.value
-        ? `Período: ${formatarMesAno(filtroMesInput.value)}`
-        : 'Período: todos os registros';
-    }
-    if (printGeradoEm) printGeradoEm.textContent = `Emitido em: ${formatarDataHoraAtual()}`;
-
-    printResumoOperador.innerHTML = `
-      <div class="print-kpi"><span>Operador</span><strong>${escaparHTML(operadorPrincipal)}</strong></div>
-      <div class="print-kpi"><span>Código</span><strong>${escaparHTML(codigoPrincipal)}</strong></div>
-      <div class="print-kpi"><span>Total de dias fechados</span><strong>${validos.length}</strong></div>
-      <div class="print-kpi"><span>Horas trabalhadas</span><strong>${formatarMinutos(totalTrabalhado)}</strong></div>
-      <div class="print-kpi"><span>Crédito</span><strong>${formatarMinutos(credito)}</strong></div>
-      <div class="print-kpi"><span>Débito</span><strong>${formatarMinutos(debito)}</strong></div>
-      <div class="print-kpi"><span>Saldo</span><strong>${formatarMinutosAssinado(saldo)}</strong></div>
-    `;
-
-    if (printTurnoBase) printTurnoBase.textContent = primeiro.turnoBase || valor(turnoBaseInput) || '07:30 / 12:00 / 13:00 / 17:30';
-    if (printMetaDiaria) printMetaDiaria.textContent = primeiro.metaDiaria || valor(metaDiariaInput) || '08:00';
-
-    if (!lista.length) {
-      printTabela.innerHTML = `<tr><td colspan="12">Nenhum registro para impressão.</td></tr>`;
-    } else {
-      printTabela.innerHTML = lista.map((registro) => {
-        const calculo = calcularRegistro(registro);
-        return `
-          <tr>
-            <td>${formatarDataBR(registro.data)}</td>
-            <td>${escaparHTML(registro.localOperacao || '-')}</td>
-            <td>${escaparHTML(registro.cidadeUf || '-')}</td>
-            <td>${escaparHTML(registro.entrada || '-')}</td>
-            <td>${escaparHTML(registro.almocoSaida || '-')}</td>
-            <td>${escaparHTML(registro.almocoVolta || '-')}</td>
-            <td>${escaparHTML(registro.pausaInicio || '-')}</td>
-            <td>${escaparHTML(registro.pausaFim || '-')}</td>
-            <td>${escaparHTML(registro.saida || '-')}</td>
-            <td>${calculo.valido ? formatarMinutos(calculo.horasTrabalhadasMinutos) : '--:--'}</td>
-            <td>${calculo.valido ? formatarMinutosAssinado(calculo.saldoMinutos) : '--:--'}</td>
-            <td>${escaparHTML(registro.observacao || '-')}</td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    if (printAssinaturaOperador) printAssinaturaOperador.textContent = operadorPrincipal;
-    if (printAssinaturaResponsavel) {
-      printAssinaturaResponsavel.textContent = primeiro.responsavelNome || valor(responsavelNomeInput) || 'Responsável / Conferência';
-    }
-  } catch (erro) {
-    console.error('Erro ao montar relatório de impressão:', erro);
-  }
-}
-
-function exportarCSV() {
-  const lista = obterRegistrosFiltrados();
-
-  if (!lista.length) {
-    alert('Não há registros para exportar.');
-    return;
+  .print-header-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    min-width: 220px;
   }
 
-  const linhas = [[
-    'Empresa',
-    'CNPJ',
-    'Responsavel',
-    'Data',
-    'Nome do Operador',
-    'Codigo',
-    'Data de Nascimento',
-    'Parceiro',
-    'Local',
-    'Cidade/UF',
-    'Entrada',
-    'Almoco Ida',
-    'Almoco Volta',
-    'Pausa Inicio',
-    'Pausa Fim',
-    'Saida',
-    'Meta Diaria',
-    'Turno Base',
-    'Horas Trabalhadas',
-    'Saldo',
-    'Status',
-    'Observacao'
-  ]];
-
-  lista.forEach((registro) => {
-    const calculo = calcularRegistro(registro);
-
-    linhas.push([
-      registro.empresaNome || '',
-      registro.empresaCnpj || '',
-      registro.responsavelNome || '',
-      formatarDataBR(registro.data),
-      registro.nomeOperador || '',
-      registro.codigoOperador || '',
-      registro.dataNascimento ? formatarDataBR(registro.dataNascimento) : '',
-      registro.parceiroEquipe || '',
-      registro.localOperacao || '',
-      registro.cidadeUf || '',
-      registro.entrada || '',
-      registro.almocoSaida || '',
-      registro.almocoVolta || '',
-      registro.pausaInicio || '',
-      registro.pausaFim || '',
-      registro.saida || '',
-      registro.metaDiaria || '',
-      registro.turnoBase || '',
-      calculo.valido ? formatarMinutos(calculo.horasTrabalhadasMinutos) : '',
-      calculo.valido ? formatarMinutosAssinado(calculo.saldoMinutos) : '',
-      calculo.status || '',
-      registro.observacao || ''
-    ]);
-  });
-
-  const csv = linhas.map((linha) => linha.map(escaparCSV).join(';')).join('\n');
-  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `controle-ponto-${filtroMesInput && filtroMesInput.value ? filtroMesInput.value : 'todos'}.csv`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-  URL.revokeObjectURL(url);
-}
-
-function imprimirRelatorio() {
-  renderizarRelatorioImpressao(obterRegistrosFiltrados());
-  window.print();
-}
-
-function diferencaMinutos(inicio, fim) {
-  return Math.round((fim.getTime() - inicio.getTime()) / 60000);
-}
-
-function converterHoraParaMinutos(valor) {
-  if (!valor || !valor.includes(':')) return NaN;
-  const [hora, minuto] = valor.split(':').map(Number);
-  return (hora * 60) + minuto;
-}
-
-function formatarMinutos(minutos) {
-  const total = Math.max(0, Math.round(minutos || 0));
-  const horas = Math.floor(total / 60);
-  const mins = total % 60;
-  return `${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-}
-
-function formatarMinutosAssinado(minutos) {
-  const total = Math.round(minutos || 0);
-  const sinal = total >= 0 ? '+' : '-';
-  const absoluto = Math.abs(total);
-  const horas = Math.floor(absoluto / 60);
-  const mins = absoluto % 60;
-  return `${sinal}${String(horas).padStart(2, '0')}:${String(mins).padStart(2, '0')}`;
-}
-
-function formatarDataBR(dataISO) {
-  if (!dataISO) return '-';
-  const [ano, mes, dia] = dataISO.split('-');
-  if (!ano || !mes || !dia) return dataISO;
-  return `${dia}/${mes}/${ano}`;
-}
-
-function formatarMesAno(valor) {
-  if (!valor || !valor.includes('-')) return valor || '-';
-  const [ano, mes] = valor.split('-');
-  return `${mes}/${ano}`;
-}
-
-function formatarDataHoraAtual() {
-  const agora = new Date();
-  const dia = String(agora.getDate()).padStart(2, '0');
-  const mes = String(agora.getMonth() + 1).padStart(2, '0');
-  const ano = agora.getFullYear();
-  const hora = String(agora.getHours()).padStart(2, '0');
-  const minuto = String(agora.getMinutes()).padStart(2, '0');
-  return `${dia}/${mes}/${ano} ${hora}:${minuto}`;
-}
-
-function obterDataInicial(registro) {
-  const data = registro?.data || '1970-01-01';
-  const entrada = registro?.entrada || '00:00';
-  return new Date(`${data}T${entrada}:00`);
-}
-
-function definirDataAtual() {
-  if (!dataInput) return;
-  const hoje = new Date();
-  const ano = hoje.getFullYear();
-  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-  const dia = String(hoje.getDate()).padStart(2, '0');
-  dataInput.value = `${ano}-${mes}-${dia}`;
-}
-
-function definirMesAtual() {
-  if (!filtroMesInput) return;
-  const hoje = new Date();
-  const ano = hoje.getFullYear();
-  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
-  filtroMesInput.value = `${ano}-${mes}`;
-}
-
-function somar(valores) {
-  return valores.reduce((acc, valor) => acc + (Number(valor) || 0), 0);
-}
-
-function escaparCSV(valor) {
-  const texto = String(valor ?? '');
-  if (texto.includes(';') || texto.includes('"') || texto.includes('\n')) {
-    return `"${texto.replace(/"/g, '""')}"`;
+  .print-meta-box {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #f8fafc;
   }
-  return texto;
-}
 
-function escaparHTML(texto) {
-  return String(texto ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#039;');
-}
-
-function gerarIdSeguro() {
-  if (window.crypto && typeof window.crypto.randomUUID === 'function') {
-    return window.crypto.randomUUID();
+  .print-meta-box span {
+    display: block;
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: 3px;
+    letter-spacing: 0.05em;
   }
-  return `id-${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
-}
 
-window.editarRegistro = editarRegistro;
-window.excluirRegistro = excluirRegistro;
+  .print-meta-box strong {
+    font-size: 12px;
+    color: #0f172a;
+  }
+
+  .print-section-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-weight: 700;
+    color: #1e3a8a;
+    margin-bottom: 8px;
+  }
+
+  .print-summary-section,
+  .print-info-grid-wrap,
+  .print-table-section {
+    margin-bottom: 12px;
+  }
+
+  .print-resumo {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .print-kpi {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #f8fafc;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-kpi span {
+    display: block;
+    font-size: 10px;
+    color: #64748b;
+    margin-bottom: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .print-kpi strong {
+    display: block;
+    font-size: 13px;
+    color: #0f172a;
+    line-height: 1.25;
+  }
+
+  .print-info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .print-info-item {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 8px 10px;
+    background: #ffffff;
+  }
+
+  .print-info-item span {
+    display: block;
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+
+  .print-info-item strong {
+    display: block;
+    font-size: 12px;
+    color: #111827;
+    line-height: 1.25;
+  }
+
+  .print-table-section {
+    break-inside: auto;
+    page-break-inside: auto;
+  }
+
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 9.5px;
+  }
+
+  .print-table thead {
+    display: table-header-group;
+  }
+
+  .print-table tr {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-table th,
+  .print-table td {
+    border: 1px solid #cbd5e1;
+    padding: 6px 7px;
+    vertical-align: top;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .print-table th {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    font-weight: 700;
+    text-align: left;
+  }
+
+  .print-table tbody tr:nth-child(even) td {
+    background: #f8fafc;
+  }
+
+  .print-footer {
+    margin-top: 14px;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .print-signatures {
+    display: flex;
+    justify-content: space-between;
+    gap: 24px;
+    margin-top: 18px;
+  }
+
+  .signature-box {
+    width: 48%;
+    text-align: center;
+  }
+
+  .signature-line {
+    border-top: 1px solid #334155;
+    height: 24px;
+    margin-bottom: 6px;
+  }
+
+  .signature-box p {
+    margin: 0;
+    font-size: 11px;
+    color: #334155;
+  }
+
+  .print-footer-note {
+    margin-top: 10px;
+    font-size: 10px;
+    color: #64748b;
+    text-align: center;
+  }
+}
