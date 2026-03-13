@@ -260,58 +260,95 @@
   </div>
 
   <section id="printArea" class="print-area">
-    <div class="print-company">
-      <div>
-        <h1 id="printEmpresaNome">Nome da Empresa</h1>
-        <p id="printEmpresaCnpj">CNPJ: 00.000.000/0001-00</p>
-      </div>
-      <div class="print-meta-right">
-        <p id="printPeriodo">Período</p>
-        <p id="printGeradoEm">Emitido em</p>
-      </div>
-    </div>
+    <div class="print-document">
+      <header class="print-header">
+        <div class="print-brand">
+          <div class="print-brand-mark">CP</div>
+          <div>
+            <h1 id="printEmpresaNome">Nome da Empresa</h1>
+            <p id="printEmpresaCnpj">CNPJ: 00.000.000/0001-00</p>
+            <p class="print-subtitle">Relatório de Controle de Ponto em Campo</p>
+          </div>
+        </div>
 
-    <div class="print-title-box">
-      <h2>Relatório de Controle de Ponto em Campo</h2>
-      <p>Documento consolidado de jornada, banco de horas e conferência operacional.</p>
-    </div>
+        <div class="print-header-meta">
+          <div class="print-meta-box">
+            <span>Período</span>
+            <strong id="printPeriodo">Período</strong>
+          </div>
+          <div class="print-meta-box">
+            <span>Emitido em</span>
+            <strong id="printGeradoEm">Emitido em</strong>
+          </div>
+        </div>
+      </header>
 
-    <div id="printResumoOperador" class="print-resumo"></div>
+      <section class="print-summary-section">
+        <div class="print-section-title">Resumo do período</div>
+        <div id="printResumoOperador" class="print-resumo"></div>
+      </section>
 
-    <table class="print-table">
-      <thead>
-        <tr>
-          <th>Data</th>
-          <th>Local</th>
-          <th>Cidade/UF</th>
-          <th>Entrada</th>
-          <th>Almoço ida</th>
-          <th>Almoço volta</th>
-          <th>Pausa início</th>
-          <th>Pausa fim</th>
-          <th>Saída</th>
-          <th>Horas</th>
-          <th>Saldo</th>
-          <th>Observação</th>
-        </tr>
-      </thead>
-      <tbody id="printTabela"></tbody>
-    </table>
+      <section class="print-info-grid-wrap">
+        <div class="print-section-title">Informações de referência</div>
+        <div class="print-info-grid">
+          <div class="print-info-item">
+            <span>Turno base</span>
+            <strong id="printTurnoBase">07:30 / 12:00 / 13:00 / 17:30</strong>
+          </div>
+          <div class="print-info-item">
+            <span>Meta diária</span>
+            <strong id="printMetaDiaria">08:00</strong>
+          </div>
+          <div class="print-info-item">
+            <span>Operador</span>
+            <strong id="printAssinaturaOperador">Operador</strong>
+          </div>
+          <div class="print-info-item">
+            <span>Responsável</span>
+            <strong id="printAssinaturaResponsavel">Responsável / Conferência</strong>
+          </div>
+        </div>
+      </section>
 
-    <div class="print-footer-notes">
-      <p><strong>Turno base:</strong> <span id="printTurnoBase">07:30 / 12:00 / 13:00 / 17:30</span></p>
-      <p><strong>Meta diária:</strong> <span id="printMetaDiaria">08:00</span></p>
-    </div>
+      <section class="print-table-section">
+        <div class="print-section-title">Lançamentos</div>
+        <table class="print-table">
+          <thead>
+            <tr>
+              <th>Data</th>
+              <th>Local</th>
+              <th>Cidade/UF</th>
+              <th>Entrada</th>
+              <th>Almoço ida</th>
+              <th>Almoço volta</th>
+              <th>Pausa início</th>
+              <th>Pausa fim</th>
+              <th>Saída</th>
+              <th>Horas</th>
+              <th>Saldo</th>
+              <th>Observação</th>
+            </tr>
+          </thead>
+          <tbody id="printTabela"></tbody>
+        </table>
+      </section>
 
-    <div class="print-signatures">
-      <div class="signature-box">
-        <div class="signature-line"></div>
-        <p id="printAssinaturaOperador">Operador</p>
-      </div>
-      <div class="signature-box">
-        <div class="signature-line"></div>
-        <p id="printAssinaturaResponsavel">Responsável / Conferência</p>
-      </div>
+      <footer class="print-footer">
+        <div class="print-signatures">
+          <div class="signature-box">
+            <div class="signature-line"></div>
+            <p id="printAssinaturaOperadorRodape">Operador</p>
+          </div>
+          <div class="signature-box">
+            <div class="signature-line"></div>
+            <p id="printAssinaturaResponsavelRodape">Responsável / Conferência</p>
+          </div>
+        </div>
+
+        <div class="print-footer-note">
+          Documento gerado automaticamente para conferência de jornada e banco de horas.
+        </div>
+      </footer>
     </div>
   </section>
 
