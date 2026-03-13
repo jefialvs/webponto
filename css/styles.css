@@ -36,6 +36,22 @@ textarea {
   font: inherit;
 }
 
+select {
+  width: 100%;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--line-strong);
+  background: #0b1729;
+  color: var(--text);
+  outline: none;
+  transition: 0.2s ease;
+}
+
+select:focus {
+  border-color: rgba(78, 168, 255, 0.8);
+  box-shadow: 0 0 0 4px rgba(78, 168, 255, 0.14);
+}
+
 .app-shell {
   width: min(1800px, calc(100% - 24px));
   margin: 16px auto 30px;
