@@ -131,7 +131,6 @@ function iniciar() {
 function aplicarOperadorPreCadastrado() {
   const chave = operadorSelect?.value;
   const operador = OPERADORES_PRE_CADASTRADOS[chave];
-
   if (!operador) return;
 
   nomeOperadorInput.value = operador.nome;
