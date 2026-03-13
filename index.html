@@ -41,17 +41,26 @@
 
           <label>
             <span>Empresa</span>
-            <input type="text" id="empresaNome" value="Nome da Empresa" maxlength="120" required />
+            <input type="text" id="empresaNome" value="Agua Pura" maxlength="120" required />
           </label>
 
           <label>
             <span>CNPJ</span>
-            <input type="text" id="empresaCnpj" value="00.000.000/0001-00" maxlength="18" />
+            <input type="text" id="empresaCnpj" value="02.809.871/0001-86" maxlength="18" />
           </label>
 
           <label>
             <span>Responsável / supervisor</span>
-            <input type="text" id="responsavelNome" value="Responsável / Conferência" maxlength="120" />
+            <input type="text" id="responsavelNome" value="Diego" maxlength="120" />
+          </label>
+
+          <label>
+            <span>Operador pré-cadastrado</span>
+            <select id="operadorSelect">
+              <option value="">Selecione</option>
+              <option value="jhon">Jhon Leno Queiroz da Silva</option>
+              <option value="jeferson">Jeferson Alves de Brito</option>
+            </select>
           </label>
 
           <label>
@@ -81,7 +90,7 @@
 
           <label>
             <span>Cidade / UF</span>
-            <input type="text" id="cidadeUf" maxlength="80" placeholder="Ex.: Manaus/AM" />
+            <input type="text" id="cidadeUf" maxlength="80" value="Manaus/AM" />
           </label>
 
           <label>
@@ -121,7 +130,7 @@
 
           <label>
             <span>Meta diária</span>
-            <input type="time" id="metaDiaria" value="08:00" />
+            <input type="time" id="metaDiaria" value="09:00" />
           </label>
 
           <label>
@@ -265,8 +274,8 @@
         <div class="print-brand">
           <div class="print-brand-mark">CP</div>
           <div>
-            <h1 id="printEmpresaNome">Nome da Empresa</h1>
-            <p id="printEmpresaCnpj">CNPJ: 00.000.000/0001-00</p>
+            <h1 id="printEmpresaNome">Agua Pura</h1>
+            <p id="printEmpresaCnpj">CNPJ: 02.809.871/0001-86</p>
             <p class="print-subtitle">Relatório de Controle de Ponto em Campo</p>
           </div>
         </div>
@@ -297,7 +306,7 @@
           </div>
           <div class="print-info-item">
             <span>Meta diária</span>
-            <strong id="printMetaDiaria">08:00</strong>
+            <strong id="printMetaDiaria">09:00</strong>
           </div>
           <div class="print-info-item">
             <span>Operador</span>
@@ -305,7 +314,7 @@
           </div>
           <div class="print-info-item">
             <span>Responsável</span>
-            <strong id="printAssinaturaResponsavel">Responsável / Conferência</strong>
+            <strong id="printAssinaturaResponsavel">Diego</strong>
           </div>
         </div>
       </section>
@@ -341,7 +350,7 @@
           </div>
           <div class="signature-box">
             <div class="signature-line"></div>
-            <p id="printAssinaturaResponsavelRodape">Responsável / Conferência</p>
+            <p id="printAssinaturaResponsavelRodape">Diego</p>
           </div>
         </div>
 
